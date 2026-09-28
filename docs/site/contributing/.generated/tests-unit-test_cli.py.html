@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>tests/unit/test_cli.py &#8212; qcom-ptool  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <script src="../../_static/documentation_options.js?v=dd1dafa6"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="tests/unit/test_cli_board.py" href="tests-unit-test_cli_board.py.html" />
+    <link rel="prev" title="tests/unit/test_board.py" href="tests-unit-test_board.py.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="tests-unit-test-cli-py">
+<h1>tests/unit/test_cli.py<a class="headerlink" href="#tests-unit-test-cli-py" title="Link to this heading">¶</a></h1>
+<p><a class="reference external" href="https://github.com/devdocsorg/qcom-ptool/blob/docs/repository-documentation/tests/unit/test_cli.py">Source</a></p>
+<p id="module-unit.test_cli">Tests for the qcom-ptool CLI dispatcher.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="unit.test_cli.subprocess_env">
+<span class="sig-prename descclassname"><span class="pre">unit.test_cli.</span></span><span class="sig-name descname"><span class="pre">subprocess_env</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#unit.test_cli.subprocess_env" title="Link to this definition">¶</a></dt>
+<dd><p>Return the environment with the repository root on <code class="docutils literal notranslate"><span class="pre">PYTHONPATH</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A copy of <code class="docutils literal notranslate"><span class="pre">os.environ</span></code> for subprocesses.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict[str, str]</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">subprocess.run(cmd,</span> <span class="pre">env=subprocess_env())</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="unit.test_cli.run_cli">
+<span class="sig-prename descclassname"><span class="pre">unit.test_cli.</span></span><span class="sig-name descname"><span class="pre">run_cli</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#unit.test_cli.run_cli" title="Link to this definition">¶</a></dt>
+<dd><p>Run <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">qcom_ptool.cli</span></code> with arguments and capture its output.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>args</strong> (<em>str</em>) -- Command-line arguments.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The completed process with text output.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>subprocess.CompletedProcess[str]</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">run_cli(&quot;--version&quot;).returncode</span></code> returns <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="unit.test_cli.test_version_flag">
+<span class="sig-prename descclassname"><span class="pre">unit.test_cli.</span></span><span class="sig-name descname"><span class="pre">test_version_flag</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#unit.test_cli.test_version_flag" title="Link to this definition">¶</a></dt>
+<dd><p>Check that <code class="docutils literal notranslate"><span class="pre">--version</span></code> prints the package version.</p>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">pytest</span> <span class="pre">tests/unit/test_cli.py::test_version_flag</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="unit.test_cli.test_help_lists_all_subcommands">
+<span class="sig-prename descclassname"><span class="pre">unit.test_cli.</span></span><span class="sig-name descname"><span class="pre">test_help_lists_all_subcommands</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#unit.test_cli.test_help_lists_all_subcommands" title="Link to this definition">¶</a></dt>
+<dd><p>Check that <code class="docutils literal notranslate"><span class="pre">--help</span></code> lists every subcommand.</p>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">pytest</span> <span class="pre">tests/unit/test_cli.py::test_help_lists_all_subcommands</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="unit.test_cli.test_unknown_subcommand_rejected">
+<span class="sig-prename descclassname"><span class="pre">unit.test_cli.</span></span><span class="sig-name descname"><span class="pre">test_unknown_subcommand_rejected</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#unit.test_cli.test_unknown_subcommand_rejected" title="Link to this definition">¶</a></dt>
+<dd><p>Check that an unknown subcommand exits with status 2.</p>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">pytest</span> <span class="pre">tests/unit/test_cli.py::test_unknown_subcommand_rejected</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="unit.test_cli.test_subcommand_dispatch">
+<span class="sig-prename descclassname"><span class="pre">unit.test_cli.</span></span><span class="sig-name descname"><span class="pre">test_subcommand_dispatch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#unit.test_cli.test_subcommand_dispatch" title="Link to this definition">¶</a></dt>
+<dd><p>Check that each subcommand runs and fails without arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) -- Subcommand name from <code class="docutils literal notranslate"><span class="pre">SUBCOMMANDS</span></code>.</p></li>
+<li><p><strong>tmp_path</strong> (<em>pathlib.Path</em>) -- Temporary directory for test files.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">pytest</span> <span class="pre">tests/unit/test_cli.py::test_subcommand_dispatch</span></code></p>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../README.html">qcom-ptool</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../user/README.html">User documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../README.html">Contributor documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../CONTRIBUTING.html">Contributing to qcom-ptool</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../DEVELOPMENT.html">Set up your development environment</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../README.html#function-reference">Function reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href=".github-test_reference_coverage.py.html">.github/test_reference_coverage.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="degpt-src-lib.rs.html">degpt/src/lib.rs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="degpt-src-main.rs.html">degpt/src/main.rs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="degpt-src-mygpt-header.rs.html">degpt/src/mygpt/header.rs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="degpt-src-mygpt-partition.rs.html">degpt/src/mygpt/partition.rs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="degpt-src-mygpt.rs.html">degpt/src/mygpt.rs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-board.py.html">qcom_ptool/board.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-cli.py.html">qcom_ptool/cli.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-gen_contents.py.html">qcom_ptool/gen_contents.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-gen_partition.py.html">qcom_ptool/gen_partition.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-gen_udev_rules.py.html">qcom_ptool/gen_udev_rules.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-loaders-__init__.py.html">qcom_ptool/loaders/__init__.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-loaders-conf.py.html">qcom_ptool/loaders/conf.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-loaders-yaml.py.html">qcom_ptool/loaders/yaml.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-msp.py.html">qcom_ptool/msp.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-ptool.py.html">qcom_ptool/ptool.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-show.py.html">qcom_ptool/show.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-spec.py.html">qcom_ptool/spec.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-utils.py.html">qcom_ptool/utils.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests-unit-test_board.py.html">tests/unit/test_board.py</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">tests/unit/test_cli.py</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#unit.test_cli.subprocess_env"><code class="docutils literal notranslate"><span class="pre">subprocess_env()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#unit.test_cli.run_cli"><code class="docutils literal notranslate"><span class="pre">run_cli()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#unit.test_cli.test_version_flag"><code class="docutils literal notranslate"><span class="pre">test_version_flag()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#unit.test_cli.test_help_lists_all_subcommands"><code class="docutils literal notranslate"><span class="pre">test_help_lists_all_subcommands()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#unit.test_cli.test_unknown_subcommand_rejected"><code class="docutils literal notranslate"><span class="pre">test_unknown_subcommand_rejected()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#unit.test_cli.test_subcommand_dispatch"><code class="docutils literal notranslate"><span class="pre">test_subcommand_dispatch()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tests-unit-test_cli_board.py.html">tests/unit/test_cli_board.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests-unit-test_gen_partition.py.html">tests/unit/test_gen_partition.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests-unit-test_gen_udev_rules.py.html">tests/unit/test_gen_udev_rules.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests-unit-test_loaders_conf.py.html">tests/unit/test_loaders_conf.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests-unit-test_loaders_yaml.py.html">tests/unit/test_loaders_yaml.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests-unit-test_utils.py.html">tests/unit/test_utils.py</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../README.html#files">Files</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../README.html">Documentation overview</a><ul>
+  <li><a href="../README.html">Contributor documentation</a><ul>
+      <li>Previous: <a href="tests-unit-test_board.py.html" title="previous chapter">tests/unit/test_board.py</a></li>
+      <li>Next: <a href="tests-unit-test_cli_board.py.html" title="next chapter">tests/unit/test_cli_board.py</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      
+      
+      
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

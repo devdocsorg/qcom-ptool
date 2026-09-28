@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>qcom_ptool/board.py &#8212; qcom-ptool  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <script src="../../_static/documentation_options.js?v=dd1dafa6"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="qcom_ptool/cli.py" href="qcom_ptool-cli.py.html" />
+    <link rel="prev" title="degpt/src/mygpt.rs" href="degpt-src-mygpt.rs.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="qcom-ptool-board-py">
+<h1>qcom_ptool/board.py<a class="headerlink" href="#qcom-ptool-board-py" title="Link to this heading">¶</a></h1>
+<p><a class="reference external" href="https://github.com/devdocsorg/qcom-ptool/blob/docs/repository-documentation/qcom_ptool/board.py">Source</a></p>
+<p id="module-qcom_ptool.board">Multi-storage board model and composition resolver.</p>
+<p>A board file declares a <code class="docutils literal notranslate"><span class="pre">platform</span></code> and a list of <code class="docutils literal notranslate"><span class="pre">storage</span></code> devices, each
+with its own partitions. Three composition mechanisms layer on top:</p>
+<ul class="simple">
+<li><p>board-level <code class="docutils literal notranslate"><span class="pre">extends:</span></code> - inherit a single base board and override by
+stable identifier (storage <code class="docutils literal notranslate"><span class="pre">id</span></code>, partition <code class="docutils literal notranslate"><span class="pre">name</span></code>);</p></li>
+<li><p>storage-level <code class="docutils literal notranslate"><span class="pre">includes:</span></code> - concatenate shared partition fragments from
+<code class="docutils literal notranslate"><span class="pre">_common/</span></code> into a storage's partition list;</p></li>
+<li><p>variant overlays (<code class="docutils literal notranslate"><span class="pre">--hlos</span></code> / <code class="docutils literal notranslate"><span class="pre">--boot-fw</span></code>) - applied last, merged by the
+same identifiers.</p></li>
+</ul>
+<p>Resolution order is: base board -&gt; derived board -&gt; storage includes -&gt;
+variant overlays. Merges are deep and field-by-field; entries are matched by
+<code class="docutils literal notranslate"><span class="pre">id</span></code> (storage) or <code class="docutils literal notranslate"><span class="pre">name</span></code> (partition), and anything unmatched is appended
+in file order. There is no partition deletion in v1.</p>
+<p>The resolver operates on raw YAML dicts. Each fully-resolved storage is then
+validated against the strict single-storage <code class="docutils literal notranslate"><span class="pre">partitions.schema.json</span></code> and
+reduced to a <a class="reference internal" href="qcom_ptool-spec.py.html#qcom_ptool.spec.LoadedSpec" title="qcom_ptool.spec.LoadedSpec"><code class="xref py py-class docutils literal notranslate"><span class="pre">qcom_ptool.spec.LoadedSpec</span></code></a> through the very same
+normalisation helpers the YAML loader uses, so a resolved board emits XML
+byte-identical to an equivalent hand-written single-storage file.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="qcom_ptool.board.BoardResolveError">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">qcom_ptool.board.</span></span><span class="sig-name descname"><span class="pre">BoardResolveError</span></span><a class="headerlink" href="#qcom_ptool.board.BoardResolveError" title="Link to this definition">¶</a></dt>
+<dd><p>Raised when a board file cannot be loaded, composed or validated.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qcom_ptool.board.ResolvedBoard">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">qcom_ptool.board.</span></span><span class="sig-name descname"><span class="pre">ResolvedBoard</span></span><a class="headerlink" href="#qcom_ptool.board.ResolvedBoard" title="Link to this definition">¶</a></dt>
+<dd><p>A board with every extends/includes/variant applied.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qcom_ptool.board.ResolvedBoard.platform">
+<span class="sig-name descname"><span class="pre">platform</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#qcom_ptool.board.ResolvedBoard.platform" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qcom_ptool.board.ResolvedBoard.storage">
+<span class="sig-name descname"><span class="pre">storage</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#qcom_ptool.board.ResolvedBoard.storage" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.board._load_schema">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.board.</span></span><span class="sig-name descname"><span class="pre">_load_schema</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#qcom_ptool.board._load_schema" title="Link to this definition">¶</a></dt>
+<dd><p>Return a packaged JSON Schema by file name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> -- Schema file in <code class="docutils literal notranslate"><span class="pre">qcom_ptool/schema</span></code>, such as <code class="docutils literal notranslate"><span class="pre">board.schema.json</span></code>.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The parsed schema.</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">_load_schema(&quot;board.schema.json&quot;)[&quot;required&quot;]</span></code> returns <code class="docutils literal notranslate"><span class="pre">[&quot;storage&quot;]</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.board._read_mapping">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.board.</span></span><span class="sig-name descname"><span class="pre">_read_mapping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#qcom_ptool.board._read_mapping" title="Link to this definition">¶</a></dt>
+<dd><p>Load <code class="docutils literal notranslate"><span class="pre">path</span></code> as YAML, validate against <code class="docutils literal notranslate"><span class="pre">schema</span></code> and return a copy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> -- YAML file to read.</p></li>
+<li><p><strong>schema</strong> -- Schema file name used for validation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A deep copy of the validated mapping.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#qcom_ptool.board.BoardResolveError" title="qcom_ptool.board.BoardResolveError"><strong>BoardResolveError</strong></a> -- If the file cannot be read, is not a mapping, or fails validation.</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">_read_mapping(&quot;platforms/boards/glymur-crd.yaml&quot;,</span> <span class="pre">&quot;board.schema.json&quot;)[&quot;platform&quot;]</span></code>
+returns <code class="docutils literal notranslate"><span class="pre">{&quot;name&quot;:</span> <span class="pre">&quot;glymur-crd&quot;}</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.board._merge_partitions">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.board.</span></span><span class="sig-name descname"><span class="pre">_merge_partitions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlay</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">collections.abc.Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">collections.abc.Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#qcom_ptool.board._merge_partitions" title="Link to this definition">¶</a></dt>
+<dd><p>Merge <code class="docutils literal notranslate"><span class="pre">overlay</span></code> partitions into <code class="docutils literal notranslate"><span class="pre">base</span></code> by <code class="docutils literal notranslate"><span class="pre">name</span></code>.</p>
+<p>A same-named partition is deep-merged field-by-field in place (so an
+override can set only <code class="docutils literal notranslate"><span class="pre">size</span></code> and inherit the rest); a new partition is
+appended in overlay order. Nothing is ever moved or removed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base</strong> -- Partition list changed in place.</p></li>
+<li><p><strong>overlay</strong> -- Partitions merged into <code class="docutils literal notranslate"><span class="pre">base</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">_merge_partitions(base,</span> <span class="pre">[{&quot;name&quot;:</span> <span class="pre">&quot;efi&quot;,</span> <span class="pre">&quot;size&quot;:</span> <span class="pre">&quot;8KB&quot;}])</span></code> changes only the
+size of <code class="docutils literal notranslate"><span class="pre">efi</span></code> in <code class="docutils literal notranslate"><span class="pre">base</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.board._merge_storage">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.board.</span></span><span class="sig-name descname"><span class="pre">_merge_storage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlay</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">collections.abc.Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#qcom_ptool.board._merge_storage" title="Link to this definition">¶</a></dt>
+<dd><p>Merge one storage <code class="docutils literal notranslate"><span class="pre">overlay</span></code> into <code class="docutils literal notranslate"><span class="pre">base</span></code> (matched by id upstream).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base</strong> -- Storage mapping changed in place.</p></li>
+<li><p><strong>overlay</strong> -- Storage fields to merge; <code class="docutils literal notranslate"><span class="pre">partitions</span></code> and <code class="docutils literal notranslate"><span class="pre">includes</span></code> are merged,
+other fields replace the base value.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">_merge_storage(storage,</span> <span class="pre">{&quot;id&quot;:</span> <span class="pre">&quot;ufs&quot;,</span> <span class="pre">&quot;size&quot;:</span> <span class="pre">2048})</span></code> sets <code class="docutils literal notranslate"><span class="pre">storage[&quot;size&quot;]</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.board._merge_storage_list">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.board.</span></span><span class="sig-name descname"><span class="pre">_merge_storage_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlay</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">collections.abc.Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">collections.abc.Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#qcom_ptool.board._merge_storage_list" title="Link to this definition">¶</a></dt>
+<dd><p>Merge <code class="docutils literal notranslate"><span class="pre">overlay</span></code> storage entries into <code class="docutils literal notranslate"><span class="pre">base</span></code> by <code class="docutils literal notranslate"><span class="pre">id</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base</strong> -- Storage list changed in place.</p></li>
+<li><p><strong>overlay</strong> -- Storages merged by <code class="docutils literal notranslate"><span class="pre">id</span></code>; unmatched storages are appended.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">_merge_storage_list(board[&quot;storage&quot;],</span> <span class="pre">overlay[&quot;storage&quot;])</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.board._load_board_with_extends">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.board.</span></span><span class="sig-name descname"><span class="pre">_load_board_with_extends</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#qcom_ptool.board._load_board_with_extends" title="Link to this definition">¶</a></dt>
+<dd><p>Load a board file and fold its single base (if any) underneath it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> -- Board file to load.</p></li>
+<li><p><strong>root</strong> -- Platforms directory that <code class="docutils literal notranslate"><span class="pre">extends</span></code> paths resolve against.</p></li>
+<li><p><strong>chain</strong> -- Real paths already visited, used to detect cycles.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The board with its base folded underneath it.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#qcom_ptool.board.BoardResolveError" title="qcom_ptool.board.BoardResolveError"><strong>BoardResolveError</strong></a> -- On an <code class="docutils literal notranslate"><span class="pre">extends</span></code> cycle or an invalid file.</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">_load_board_with_extends(&quot;platforms/boards/glymur-crd.yaml&quot;,</span> <span class="pre">&quot;platforms&quot;,</span> <span class="pre">())</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.board._fragment_partitions">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.board.</span></span><span class="sig-name descname"><span class="pre">_fragment_partitions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#qcom_ptool.board._fragment_partitions" title="Link to this definition">¶</a></dt>
+<dd><p>Resolve a <code class="docutils literal notranslate"><span class="pre">_common/</span></code> fragment (transitively) into a partition list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> -- Fragment file to load.</p></li>
+<li><p><strong>root</strong> -- Platforms directory that <code class="docutils literal notranslate"><span class="pre">includes</span></code> paths resolve against.</p></li>
+<li><p><strong>chain</strong> -- Real paths already visited, used to detect cycles.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The fragment's partitions after its own includes.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#qcom_ptool.board.BoardResolveError" title="qcom_ptool.board.BoardResolveError"><strong>BoardResolveError</strong></a> -- On an <code class="docutils literal notranslate"><span class="pre">includes</span></code> cycle or an invalid file.</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">_fragment_partitions(&quot;platforms/_common/boot.yaml&quot;,</span> <span class="pre">&quot;platforms&quot;,</span> <span class="pre">())</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.board._expand_includes">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.board.</span></span><span class="sig-name descname"><span class="pre">_expand_includes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">storage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#qcom_ptool.board._expand_includes" title="Link to this definition">¶</a></dt>
+<dd><p>Replace a storage's <code class="docutils literal notranslate"><span class="pre">includes:</span></code> + inline <code class="docutils literal notranslate"><span class="pre">partitions:</span></code> with one list.</p>
+<p>Ordering: included fragments in listed order first, then the storage's own
+inline partitions, with same-named entries merged in place.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>storage</strong> -- Storage mapping changed in place.</p></li>
+<li><p><strong>root</strong> -- Platforms directory that <code class="docutils literal notranslate"><span class="pre">includes</span></code> paths resolve against.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#qcom_ptool.board.BoardResolveError" title="qcom_ptool.board.BoardResolveError"><strong>BoardResolveError</strong></a> -- If an included fragment is invalid or cyclic.</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">_expand_includes(storage,</span> <span class="pre">&quot;platforms&quot;)</span></code> leaves <code class="docutils literal notranslate"><span class="pre">storage</span></code> without <code class="docutils literal notranslate"><span class="pre">includes</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.board._variant_path">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.board.</span></span><span class="sig-name descname"><span class="pre">_variant_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#qcom_ptool.board._variant_path" title="Link to this definition">¶</a></dt>
+<dd><p>Return the file path of a variant overlay.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>root</strong> -- Platforms directory.</p></li>
+<li><p><strong>axis</strong> -- Variant axis, <code class="docutils literal notranslate"><span class="pre">hlos</span></code> or <code class="docutils literal notranslate"><span class="pre">boot-fw</span></code>.</p></li>
+<li><p><strong>name</strong> -- Variant name without the <code class="docutils literal notranslate"><span class="pre">.yaml</span></code> suffix.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">&lt;root&gt;/variants/&lt;axis&gt;/&lt;name&gt;.yaml</span></code>.</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">_variant_path(&quot;platforms&quot;,</span> <span class="pre">&quot;hlos&quot;,</span> <span class="pre">&quot;debian&quot;)</span></code> returns
+<code class="docutils literal notranslate"><span class="pre">&quot;platforms/variants/hlos/debian.yaml&quot;</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.board._validate_resolved_storage">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.board.</span></span><span class="sig-name descname"><span class="pre">_validate_resolved_storage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">storage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">collections.abc.Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#qcom_ptool.board._validate_resolved_storage" title="Link to this definition">¶</a></dt>
+<dd><p>Validate a fully-resolved storage against the strict single-storage schema.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>storage</strong> -- Fully resolved storage.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#qcom_ptool.board.BoardResolveError" title="qcom_ptool.board.BoardResolveError"><strong>BoardResolveError</strong></a> -- If the storage does not satisfy <code class="docutils literal notranslate"><span class="pre">partitions.schema.json</span></code>.</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">_validate_resolved_storage(board[&quot;storage&quot;][0])</span></code> returns <code class="docutils literal notranslate"><span class="pre">None</span></code> for a valid storage.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.board.resolve_board">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.board.</span></span><span class="sig-name descname"><span class="pre">resolve_board</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hlos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boot_fw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#qcom_ptool.board.ResolvedBoard" title="qcom_ptool.board.ResolvedBoard"><span class="pre">ResolvedBoard</span></a></span></span><a class="headerlink" href="#qcom_ptool.board.resolve_board" title="Link to this definition">¶</a></dt>
+<dd><p>Resolve <code class="docutils literal notranslate"><span class="pre">path</span></code> into a fully-composed <a class="reference internal" href="#qcom_ptool.board.ResolvedBoard" title="qcom_ptool.board.ResolvedBoard"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResolvedBoard</span></code></a>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">root</span></code> is the platforms directory that <code class="docutils literal notranslate"><span class="pre">extends:</span></code> / <code class="docutils literal notranslate"><span class="pre">includes:</span></code> paths
+and variant names resolve against; it defaults to the parent of the board
+file's directory when that directory is <code class="docutils literal notranslate"><span class="pre">boards/</span></code>, else the board file's
+own directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> -- Board file.</p></li>
+<li><p><strong>root</strong> -- Platforms directory, or <code class="docutils literal notranslate"><span class="pre">None</span></code> to derive it.</p></li>
+<li><p><strong>hlos</strong> -- HLOS variant name, or <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>boot_fw</strong> -- Boot firmware variant name, or <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The composed platform and storages.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#qcom_ptool.board.BoardResolveError" title="qcom_ptool.board.BoardResolveError"><strong>BoardResolveError</strong></a> -- If a file is invalid, cyclic, or resolves to an invalid storage.</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">len(resolve_board(&quot;platforms/boards/glymur-crd.yaml&quot;)[&quot;storage&quot;])</span></code> returns <code class="docutils literal notranslate"><span class="pre">2</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.board.storage_to_loaded_spec">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.board.</span></span><span class="sig-name descname"><span class="pre">storage_to_loaded_spec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">storage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">collections.abc.Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_map</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">collections.abc.Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="qcom_ptool-spec.py.html#qcom_ptool.spec.LoadedSpec" title="qcom_ptool.spec.LoadedSpec"><span class="pre">qcom_ptool.spec.LoadedSpec</span></a></span></span><a class="headerlink" href="#qcom_ptool.board.storage_to_loaded_spec" title="Link to this definition">¶</a></dt>
+<dd><p>Reduce one resolved storage to a LoadedSpec via the YAML loader helpers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>storage</strong> -- Fully resolved storage.</p></li>
+<li><p><strong>image_map</strong> -- Partition name to image filename overrides.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The normalised disk settings and partitions.</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">storage_to_loaded_spec(board[&quot;storage&quot;][0])[&quot;disk&quot;][&quot;type&quot;]</span></code> returns <code class="docutils literal notranslate"><span class="pre">&quot;nvme&quot;</span></code>
+for Glymur-CRD.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.board.board_to_specs">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.board.</span></span><span class="sig-name descname"><span class="pre">board_to_specs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">board</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#qcom_ptool.board.ResolvedBoard" title="qcom_ptool.board.ResolvedBoard"><span class="pre">ResolvedBoard</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_map</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">collections.abc.Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="qcom_ptool-spec.py.html#qcom_ptool.spec.LoadedSpec" title="qcom_ptool.spec.LoadedSpec"><span class="pre">qcom_ptool.spec.LoadedSpec</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#qcom_ptool.board.board_to_specs" title="Link to this definition">¶</a></dt>
+<dd><p>Reduce a resolved board to <code class="docutils literal notranslate"><span class="pre">[(storage_id,</span> <span class="pre">LoadedSpec),</span> <span class="pre">...]</span></code> in order.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>board</strong> -- Resolved board.</p></li>
+<li><p><strong>image_map</strong> -- Partition name to image filename overrides.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Storage IDs paired with their normalised specifications.</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">[sid</span> <span class="pre">for</span> <span class="pre">sid,</span> <span class="pre">_</span> <span class="pre">in</span> <span class="pre">board_to_specs(board)]</span></code> returns <code class="docutils literal notranslate"><span class="pre">[&quot;nvme&quot;,</span> <span class="pre">&quot;spinor&quot;]</span></code>
+for Glymur-CRD.</p>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../README.html">qcom-ptool</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../user/README.html">User documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../README.html">Contributor documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../CONTRIBUTING.html">Contributing to qcom-ptool</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../DEVELOPMENT.html">Set up your development environment</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../README.html#function-reference">Function reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href=".github-test_reference_coverage.py.html">.github/test_reference_coverage.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="degpt-src-lib.rs.html">degpt/src/lib.rs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="degpt-src-main.rs.html">degpt/src/main.rs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="degpt-src-mygpt-header.rs.html">degpt/src/mygpt/header.rs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="degpt-src-mygpt-partition.rs.html">degpt/src/mygpt/partition.rs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="degpt-src-mygpt.rs.html">degpt/src/mygpt.rs</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">qcom_ptool/board.py</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.board.BoardResolveError"><code class="docutils literal notranslate"><span class="pre">BoardResolveError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.board.ResolvedBoard"><code class="docutils literal notranslate"><span class="pre">ResolvedBoard</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#qcom_ptool.board.ResolvedBoard.platform"><code class="docutils literal notranslate"><span class="pre">ResolvedBoard.platform</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#qcom_ptool.board.ResolvedBoard.storage"><code class="docutils literal notranslate"><span class="pre">ResolvedBoard.storage</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.board._load_schema"><code class="docutils literal notranslate"><span class="pre">_load_schema()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.board._read_mapping"><code class="docutils literal notranslate"><span class="pre">_read_mapping()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.board._merge_partitions"><code class="docutils literal notranslate"><span class="pre">_merge_partitions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.board._merge_storage"><code class="docutils literal notranslate"><span class="pre">_merge_storage()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.board._merge_storage_list"><code class="docutils literal notranslate"><span class="pre">_merge_storage_list()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.board._load_board_with_extends"><code class="docutils literal notranslate"><span class="pre">_load_board_with_extends()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.board._fragment_partitions"><code class="docutils literal notranslate"><span class="pre">_fragment_partitions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.board._expand_includes"><code class="docutils literal notranslate"><span class="pre">_expand_includes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.board._variant_path"><code class="docutils literal notranslate"><span class="pre">_variant_path()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.board._validate_resolved_storage"><code class="docutils literal notranslate"><span class="pre">_validate_resolved_storage()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.board.resolve_board"><code class="docutils literal notranslate"><span class="pre">resolve_board()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.board.storage_to_loaded_spec"><code class="docutils literal notranslate"><span class="pre">storage_to_loaded_spec()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.board.board_to_specs"><code class="docutils literal notranslate"><span class="pre">board_to_specs()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-cli.py.html">qcom_ptool/cli.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-gen_contents.py.html">qcom_ptool/gen_contents.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-gen_partition.py.html">qcom_ptool/gen_partition.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-gen_udev_rules.py.html">qcom_ptool/gen_udev_rules.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-loaders-__init__.py.html">qcom_ptool/loaders/__init__.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-loaders-conf.py.html">qcom_ptool/loaders/conf.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-loaders-yaml.py.html">qcom_ptool/loaders/yaml.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-msp.py.html">qcom_ptool/msp.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-ptool.py.html">qcom_ptool/ptool.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-show.py.html">qcom_ptool/show.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-spec.py.html">qcom_ptool/spec.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-utils.py.html">qcom_ptool/utils.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests-unit-test_board.py.html">tests/unit/test_board.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests-unit-test_cli.py.html">tests/unit/test_cli.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests-unit-test_cli_board.py.html">tests/unit/test_cli_board.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests-unit-test_gen_partition.py.html">tests/unit/test_gen_partition.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests-unit-test_gen_udev_rules.py.html">tests/unit/test_gen_udev_rules.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests-unit-test_loaders_conf.py.html">tests/unit/test_loaders_conf.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests-unit-test_loaders_yaml.py.html">tests/unit/test_loaders_yaml.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests-unit-test_utils.py.html">tests/unit/test_utils.py</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../README.html#files">Files</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../README.html">Documentation overview</a><ul>
+  <li><a href="../README.html">Contributor documentation</a><ul>
+      <li>Previous: <a href="degpt-src-mygpt.rs.html" title="previous chapter">degpt/src/mygpt.rs</a></li>
+      <li>Next: <a href="qcom_ptool-cli.py.html" title="next chapter">qcom_ptool/cli.py</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      
+      
+      
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

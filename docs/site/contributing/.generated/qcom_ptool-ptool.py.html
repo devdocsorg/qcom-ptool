@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>qcom_ptool/ptool.py &#8212; qcom-ptool  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <script src="../../_static/documentation_options.js?v=dd1dafa6"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="qcom_ptool/show.py" href="qcom_ptool-show.py.html" />
+    <link rel="prev" title="qcom_ptool/msp.py" href="qcom_ptool-msp.py.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="qcom-ptool-ptool-py">
+<h1>qcom_ptool/ptool.py<a class="headerlink" href="#qcom-ptool-ptool-py" title="Link to this heading">¶</a></h1>
+<p><a class="reference external" href="https://github.com/devdocsorg/qcom-ptool/blob/docs/repository-documentation/qcom_ptool/ptool.py">Source</a></p>
+<dl class="py function" id="module-qcom_ptool.ptool">
+<dt class="sig sig-object py" id="qcom_ptool.ptool.ShowPartitionExample">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.ptool.</span></span><span class="sig-name descname"><span class="pre">ShowPartitionExample</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.ptool.ShowPartitionExample" title="Link to this definition">¶</a></dt>
+<dd><p>Print an example <code class="docutils literal notranslate"><span class="pre">partition.xml</span></code> with two physical partitions.</p>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">ShowPartitionExample()</span></code> runs when <code class="docutils literal notranslate"><span class="pre">-p</span></code> names a missing physical partition.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.ptool.ConvertKBtoSectors">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.ptool.</span></span><span class="sig-name descname"><span class="pre">ConvertKBtoSectors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.ptool.ConvertKBtoSectors" title="Link to this definition">¶</a></dt>
+<dd><p>Convert kilobytes to sectors of the current <code class="docutils literal notranslate"><span class="pre">SECTOR_SIZE_IN_BYTES</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>int</em><em> | </em><em>float</em>) -- Size in kilobytes.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whole number of sectors.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">ConvertKBtoSectors(1)</span></code> returns <code class="docutils literal notranslate"><span class="pre">2</span></code> with 512-byte sectors.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.ptool.UpdatePatch">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.ptool.</span></span><span class="sig-name descname"><span class="pre">UpdatePatch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">StartSector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ByteOffset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PHYPartition</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size_in_bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">szvalue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">szfilename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">szwhat</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.ptool.UpdatePatch" title="Link to this definition">¶</a></dt>
+<dd><p>Append a <code class="docutils literal notranslate"><span class="pre">patch</span></code> element to the global <code class="docutils literal notranslate"><span class="pre">PatchesXML</span></code> tree.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>StartSector</strong> (<em>str</em>) -- Sector to patch, as text such as <code class="docutils literal notranslate"><span class="pre">&quot;NUM_DISK_SECTORS-1.&quot;</span></code>.</p></li>
+<li><p><strong>ByteOffset</strong> (<em>str</em>) -- Byte offset within the sector, as text.</p></li>
+<li><p><strong>PHYPartition</strong> (<em>int</em>) -- Physical partition (LUN) number.</p></li>
+<li><p><strong>size_in_bytes</strong> (<em>int</em>) -- Number of bytes the patch writes.</p></li>
+<li><p><strong>szvalue</strong> (<em>str</em>) -- Value expression evaluated by the flashing tool.</p></li>
+<li><p><strong>szfilename</strong> (<em>str</em>) -- File to patch, or <code class="docutils literal notranslate"><span class="pre">DISK</span></code> for the device itself.</p></li>
+<li><p><strong>szwhat</strong> (<em>str</em>) -- Human-readable description of the patch.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">UpdatePatch(&quot;1&quot;,</span> <span class="pre">&quot;32&quot;,</span> <span class="pre">0,</span> <span class="pre">8,</span> <span class="pre">&quot;NUM_DISK_SECTORS-1.&quot;,</span> <span class="pre">&quot;DISK&quot;,</span> <span class="pre">&quot;Update</span> <span class="pre">last</span> <span class="pre">LBA&quot;)</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.ptool.UpdateRawProgram">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.ptool.</span></span><span class="sig-name descname"><span class="pre">UpdateRawProgram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">RawProgramXML</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">StartSector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size_in_KB</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PHYPartition</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_sector_offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_partition_sectors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparse</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">readbackverify</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'false'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">partofsingleimage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'false'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.ptool.UpdateRawProgram" title="Link to this definition">¶</a></dt>
+<dd><p>Append a <code class="docutils literal notranslate"><span class="pre">program</span></code> element, and optionally an <code class="docutils literal notranslate"><span class="pre">erase</span></code> element, to a rawprogram tree.</p>
+<p>A negative <code class="docutils literal notranslate"><span class="pre">StartSector</span></code> is written relative to <code class="docutils literal notranslate"><span class="pre">NUM_DISK_SECTORS</span></code>. With the
+<code class="docutils literal notranslate"><span class="pre">-e</span></code> option, every partition except <code class="docutils literal notranslate"><span class="pre">cdt</span></code> is erased before it is programmed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>RawProgramXML</strong> (<em>xml.etree.ElementTree.Element</em>) -- Rawprogram tree that receives the elements.</p></li>
+<li><p><strong>StartSector</strong> (<em>int</em>) -- First sector; negative values count back from the end of the disk.</p></li>
+<li><p><strong>size_in_KB</strong> (<em>int</em><em> | </em><em>float</em>) -- Partition size in kilobytes.</p></li>
+<li><p><strong>PHYPartition</strong> (<em>int</em>) -- Physical partition (LUN) number.</p></li>
+<li><p><strong>file_sector_offset</strong> (<em>int</em>) -- Sector offset within the source file.</p></li>
+<li><p><strong>num_partition_sectors</strong> (<em>int</em>) -- Partition size in sectors; values below 1 become 0.</p></li>
+<li><p><strong>filename</strong> (<em>str</em>) -- Image written to the partition, or an empty string.</p></li>
+<li><p><strong>sparse</strong> (<em>str</em>) -- <code class="docutils literal notranslate"><span class="pre">&quot;true&quot;</span></code> when the image is a sparse image.</p></li>
+<li><p><strong>label</strong> (<em>str</em>) -- Partition label.</p></li>
+<li><p><strong>readbackverify</strong> (<em>str</em>) -- <code class="docutils literal notranslate"><span class="pre">&quot;true&quot;</span></code> to request read-back verification.</p></li>
+<li><p><strong>partofsingleimage</strong> (<em>str</em>) -- <code class="docutils literal notranslate"><span class="pre">&quot;true&quot;</span></code> when the image is part of a single disk image.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">UpdateRawProgram(RawProgramXML,</span> <span class="pre">0,</span> <span class="pre">0.5,</span> <span class="pre">0,</span> <span class="pre">0,</span> <span class="pre">1,</span> <span class="pre">&quot;gpt_main0.bin&quot;,</span> <span class="pre">&quot;false&quot;,</span> <span class="pre">&quot;PrimaryGPT&quot;)</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.ptool.ValidGUIDForm">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.ptool.</span></span><span class="sig-name descname"><span class="pre">ValidGUIDForm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">GUID</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.ptool.ValidGUIDForm" title="Link to this definition">¶</a></dt>
+<dd><p>Report whether a value is written as a GUID that ptool accepts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>GUID</strong> (<em>str</em><em> | </em><em>int</em>) -- <code class="docutils literal notranslate"><span class="pre">0x</span></code> followed by 32 hex digits, or the dashed GUID form.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> when the value matches either form.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">ValidGUIDForm(&quot;C12A7328-F81F-11D2-BA4B-00A0C93EC93B&quot;)</span></code> returns <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.ptool.ValidateTYPE">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.ptool.</span></span><span class="sig-name descname"><span class="pre">ValidateTYPE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.ptool.ValidateTYPE" title="Link to this definition">¶</a></dt>
+<dd><p>Convert an MBR partition type to an integer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Type</strong> (<em>int</em><em> | </em><em>str</em>) -- Integer from 0 to 255, or one or two hex digits with an optional <code class="docutils literal notranslate"><span class="pre">0x</span></code>.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The partition type byte.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>SystemExit</strong> -- With status 1 when the value is not a valid type.</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">ValidateTYPE(&quot;0x4C&quot;)</span></code> returns <code class="docutils literal notranslate"><span class="pre">76</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.ptool.ValidateGUID">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.ptool.</span></span><span class="sig-name descname"><span class="pre">ValidateGUID</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">GUID</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.ptool.ValidateGUID" title="Link to this definition">¶</a></dt>
+<dd><p>Convert a GPT partition type or unique GUID to its 128-bit integer form.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>GUID</strong> (<em>str</em><em> | </em><em>int</em>) -- <code class="docutils literal notranslate"><span class="pre">0x</span></code> followed by 32 hex digits, or the dashed GUID form.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The GUID as stored in the GPT, or <code class="docutils literal notranslate"><span class="pre">PARTITION_BASIC_DATA_GUID</span></code> after a
+warning when the value is not a GUID.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">hex(ValidateGUID(&quot;C12A7328-F81F-11D2-BA4B-00A0C93EC93B&quot;))</span></code> returns
+<code class="docutils literal notranslate"><span class="pre">&quot;0x3bc93ec9a0004bba11d2f81fc12a7328&quot;</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.ptool.WriteGPT">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.ptool.</span></span><span class="sig-name descname"><span class="pre">WriteGPT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">GPTMAIN</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">GPTBACKUP</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">GPTEMPTY</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.ptool.WriteGPT" title="Link to this definition">¶</a></dt>
+<dd><p>Write the primary, backup, combined and empty GPT image files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>GPTMAIN</strong> (<em>str</em>) -- Path for the protective MBR and primary GPT.</p></li>
+<li><p><strong>GPTBACKUP</strong> (<em>str</em>) -- Path for the backup GPT.</p></li>
+<li><p><strong>GPTEMPTY</strong> (<em>str</em>) -- Path for a valid GPT with no usable partitions.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">WriteGPT(&quot;gpt_main0.bin&quot;,</span> <span class="pre">&quot;gpt_backup0.bin&quot;,</span> <span class="pre">&quot;gpt_empty0.bin&quot;)</span></code> also writes
+the file named by the global <code class="docutils literal notranslate"><span class="pre">GPTBOTH</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.ptool.FillInEmptyGPT">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.ptool.</span></span><span class="sig-name descname"><span class="pre">FillInEmptyGPT</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.ptool.FillInEmptyGPT" title="Link to this definition">¶</a></dt>
+<dd><p>Fill the global <code class="docutils literal notranslate"><span class="pre">EmptyGPT</span></code> with a header and a single placeholder partition.</p>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">FillInEmptyGPT()</span></code> runs before <a class="reference internal" href="#qcom_ptool.ptool.WriteGPT" title="qcom_ptool.ptool.WriteGPT"><code class="xref py py-func docutils literal notranslate"><span class="pre">WriteGPT()</span></code></a> writes <code class="docutils literal notranslate"><span class="pre">gpt_empty&lt;N&gt;.bin</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.ptool.UpdatePrimaryGPT">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.ptool.</span></span><span class="sig-name descname"><span class="pre">UpdatePrimaryGPT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.ptool.UpdatePrimaryGPT" title="Link to this definition">¶</a></dt>
+<dd><p>Store a little-endian value in the global <code class="docutils literal notranslate"><span class="pre">PrimaryGPT</span></code> byte list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> (<em>int</em>) -- Value to store.</p></li>
+<li><p><strong>length</strong> (<em>int</em>) -- Number of bytes to write.</p></li>
+<li><p><strong>i</strong> (<em>int</em>) -- Byte offset of the first byte.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The offset after the written bytes.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">UpdatePrimaryGPT(1,</span> <span class="pre">8,</span> <span class="pre">i)</span></code> writes the current LBA field and returns <code class="docutils literal notranslate"><span class="pre">i</span> <span class="pre">+</span> <span class="pre">8</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.ptool.UpdateBackupGPT">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.ptool.</span></span><span class="sig-name descname"><span class="pre">UpdateBackupGPT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.ptool.UpdateBackupGPT" title="Link to this definition">¶</a></dt>
+<dd><p>Store a little-endian value in the global <code class="docutils literal notranslate"><span class="pre">BackupGPT</span></code> byte list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> (<em>int</em>) -- Value to store.</p></li>
+<li><p><strong>length</strong> (<em>int</em>) -- Number of bytes to write.</p></li>
+<li><p><strong>i</strong> (<em>int</em>) -- Byte offset of the first byte.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The offset after the written bytes.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">UpdateBackupGPT(1,</span> <span class="pre">8,</span> <span class="pre">i)</span></code> writes one field and returns <code class="docutils literal notranslate"><span class="pre">i</span> <span class="pre">+</span> <span class="pre">8</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.ptool.ShowBackupGPT">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.ptool.</span></span><span class="sig-name descname"><span class="pre">ShowBackupGPT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sector</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.ptool.ShowBackupGPT" title="Link to this definition">¶</a></dt>
+<dd><p>Print the first 512 bytes of one sector of the backup GPT as hex.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sector</strong> (<em>int</em>) -- Sector index within the backup GPT.</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">ShowBackupGPT(0)</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.ptool.CreateFileOfZeros">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.ptool.</span></span><span class="sig-name descname"><span class="pre">CreateFileOfZeros</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_total_sectors</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.ptool.CreateFileOfZeros" title="Link to this definition">¶</a></dt>
+<dd><p>Write a file containing only zero bytes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) -- File name, placed in the <code class="docutils literal notranslate"><span class="pre">-t</span></code> output folder when one is set.</p></li>
+<li><p><strong>num_total_sectors</strong> (<em>int</em>) -- File size in sectors.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>SystemExit</strong> -- With status 1 when the file cannot be written.</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">CreateFileOfZeros(&quot;zeros_1sector.bin&quot;,</span> <span class="pre">1)</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.ptool.CreateErasingRawProgramFiles">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.ptool.</span></span><span class="sig-name descname"><span class="pre">CreateErasingRawProgramFiles</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.ptool.CreateErasingRawProgramFiles" title="Link to this definition">¶</a></dt>
+<dd><p>Write the zero files and the <code class="docutils literal notranslate"><span class="pre">wipe_rawprogram_PHY&lt;N&gt;.xml</span></code> files.</p>
+<p>Each wipe file overwrites the MBR sector and the primary GPT, and the backup GPT
+unless <code class="docutils literal notranslate"><span class="pre">-n</span></code> disabled patch generation, on physical partitions 0 to 7 except 3.</p>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">CreateErasingRawProgramFiles()</span></code> runs after the GPT files are created.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.ptool.CreateGPTPartitionTable">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.ptool.</span></span><span class="sig-name descname"><span class="pre">CreateGPTPartitionTable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">PhysicalPartitionNumber</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">UserProvided</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.ptool.CreateGPTPartitionTable" title="Link to this definition">¶</a></dt>
+<dd><p>Build the GPT, rawprogram and patch files for one physical partition.</p>
+<p>Partitions from the parsed XML are placed in order, aligned to the write-protect
+boundary where requested, and written to <code class="docutils literal notranslate"><span class="pre">gpt_main&lt;N&gt;.bin</span></code>, <code class="docutils literal notranslate"><span class="pre">gpt_backup&lt;N&gt;.bin</span></code>,
+<code class="docutils literal notranslate"><span class="pre">gpt_both&lt;N&gt;.bin</span></code>, <code class="docutils literal notranslate"><span class="pre">gpt_empty&lt;N&gt;.bin</span></code>, <code class="docutils literal notranslate"><span class="pre">rawprogram&lt;N&gt;.xml</span></code>, <code class="docutils literal notranslate"><span class="pre">patch&lt;N&gt;.xml</span></code>,
+and the <code class="docutils literal notranslate"><span class="pre">rawprogram&lt;N&gt;_BLANK_GPT.xml</span></code> and <code class="docutils literal notranslate"><span class="pre">rawprogram&lt;N&gt;_WIPE_PARTITIONS.xml</span></code> variants.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>PhysicalPartitionNumber</strong> (<em>int</em>) -- Physical partition (LUN) number <code class="docutils literal notranslate"><span class="pre">N</span></code>.</p></li>
+<li><p><strong>UserProvided</strong> (<em>bool</em>) -- <code class="docutils literal notranslate"><span class="pre">True</span></code> when <code class="docutils literal notranslate"><span class="pre">N</span></code> came from <code class="docutils literal notranslate"><span class="pre">-p</span></code>; a missing partition then exits.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>SystemExit</strong> -- When a user-selected partition is missing or the layout is invalid.</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">CreateGPTPartitionTable(0)</span></code> writes <code class="docutils literal notranslate"><span class="pre">gpt_main0.bin</span></code> and <code class="docutils literal notranslate"><span class="pre">rawprogram0.xml</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.ptool.AlignVariablesToEqualSigns">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.ptool.</span></span><span class="sig-name descname"><span class="pre">AlignVariablesToEqualSigns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sz</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.ptool.AlignVariablesToEqualSigns" title="Link to this definition">¶</a></dt>
+<dd><p>Remove spaces and tabs around <code class="docutils literal notranslate"><span class="pre">=</span></code> signs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sz</strong> (<em>str</em>) -- Text such as the body of <code class="docutils literal notranslate"><span class="pre">parser_instructions</span></code>.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The text with <code class="docutils literal notranslate"><span class="pre">name</span> <span class="pre">=</span> <span class="pre">value</span></code> rewritten as <code class="docutils literal notranslate"><span class="pre">name=value</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">AlignVariablesToEqualSigns(&quot;A</span> <span class="pre">=</span> <span class="pre">1&quot;)</span></code> returns <code class="docutils literal notranslate"><span class="pre">&quot;A=1&quot;</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.ptool.ReturnArrayFromSpaceSeparatedList">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.ptool.</span></span><span class="sig-name descname"><span class="pre">ReturnArrayFromSpaceSeparatedList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sz</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.ptool.ReturnArrayFromSpaceSeparatedList" title="Link to this definition">¶</a></dt>
+<dd><p>Split whitespace-separated text into a list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sz</strong> (<em>str</em>) -- Text to split.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The items in order.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[str]</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">ReturnArrayFromSpaceSeparatedList(&quot;</span> <span class="pre">A=1</span>&#160; <span class="pre">B=2</span> <span class="pre">&quot;)</span></code> returns <code class="docutils literal notranslate"><span class="pre">[&quot;A=1&quot;,</span> <span class="pre">&quot;B=2&quot;]</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.ptool.ParseXML">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.ptool.</span></span><span class="sig-name descname"><span class="pre">ParseXML</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">XMLFile</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.ptool.ParseXML" title="Link to this definition">¶</a></dt>
+<dd><p>Load a partition XML file into the global partition tables.</p>
+<p><code class="docutils literal notranslate"><span class="pre">parser_instructions</span></code> set disk options such as <code class="docutils literal notranslate"><span class="pre">SECTOR_SIZE_IN_BYTES</span></code>; each
+<code class="docutils literal notranslate"><span class="pre">physical_partition</span></code> becomes one entry of <code class="docutils literal notranslate"><span class="pre">PhyPartition</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>XMLFile</strong> (<em>str</em>) -- Partition XML file, usually generated by <code class="docutils literal notranslate"><span class="pre">gen_partition</span></code>.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>SystemExit</strong> -- When an instruction or partition attribute is invalid.</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">ParseXML(&quot;partitions.xml&quot;)</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.ptool.ValidatePartitions">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.ptool.</span></span><span class="sig-name descname"><span class="pre">ValidatePartitions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.ptool.ValidatePartitions" title="Link to this definition">¶</a></dt>
+<dd><p>Validate the partition layout:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>duplicate --name entries are checked per-LUN (two partitions
+sharing a name on one LUN cannot be addressed unambiguously);</p></li>
+<li><p>A/B slot pairing is checked across all LUNs, since some boot
+firmware (e.g. xbl_a on LUN1, xbl_b on LUN2) is split across
+separate boot LUNs by design.</p></li>
+</ul>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>SystemExit</strong> -- With status 1 when a duplicate name or unpaired slot is found.</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">ValidatePartitions()</span></code> exits when LUN 0 has two <code class="docutils literal notranslate"><span class="pre">efi</span></code> partitions.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.ptool.PrintPartitionCollection">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.ptool.</span></span><span class="sig-name descname"><span class="pre">PrintPartitionCollection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">PartitionCollection</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.ptool.PrintPartitionCollection" title="Link to this definition">¶</a></dt>
+<dd><p>Print each partition dictionary and its fields.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>PartitionCollection</strong> (<em>list</em><em>[</em><em>dict</em><em>]</em>) -- Partitions of one physical partition.</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">PrintPartitionCollection(PhyPartition[0])</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.ptool.ParseCommandLine">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.ptool.</span></span><span class="sig-name descname"><span class="pre">ParseCommandLine</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.ptool.ParseCommandLine" title="Link to this definition">¶</a></dt>
+<dd><p>Read the XML file, table format and physical partition from positional arguments.</p>
+<p>This handles the older <code class="docutils literal notranslate"><span class="pre">ptool.py</span> <span class="pre">&lt;xml&gt;</span> <span class="pre">[mbr|gpt]</span> <span class="pre">[N]</span></code> form; <code class="docutils literal notranslate"><span class="pre">-x</span></code> options are
+handled by the script's main code.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>SystemExit</strong> -- With status 1 when the physical partition is not a number.</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">ParseCommandLine()</span></code> with <code class="docutils literal notranslate"><span class="pre">sys.argv</span> <span class="pre">==</span> <span class="pre">[&quot;ptool&quot;,</span> <span class="pre">&quot;partition.xml&quot;,</span> <span class="pre">&quot;gpt&quot;,</span> <span class="pre">&quot;0&quot;]</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.ptool.UpdateWPhash">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.ptool.</span></span><span class="sig-name descname"><span class="pre">UpdateWPhash</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Size</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.ptool.UpdateWPhash" title="Link to this definition">¶</a></dt>
+<dd><p>Extend the write-protect regions so they cover a partition.</p>
+<p>The regions are later written to <code class="docutils literal notranslate"><span class="pre">emmc_lock_regions.xml</span></code>. Nothing is recorded
+when <code class="docutils literal notranslate"><span class="pre">WRITE_PROTECT_BOUNDARY_IN_KB</span></code> is 0.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Start</strong> (<em>int</em>) -- First sector of the partition.</p></li>
+<li><p><strong>Size</strong> (<em>int</em>) -- Partition size in sectors.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">UpdateWPhash(34,</span> <span class="pre">1024)</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.ptool.HexPrettyPrint">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.ptool.</span></span><span class="sig-name descname"><span class="pre">HexPrettyPrint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Length</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.ptool.HexPrettyPrint" title="Link to this definition">¶</a></dt>
+<dd><p>Format bytes as a hex and ASCII dump.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>bytes</em><em> | </em><em>list</em><em>[</em><em>int</em><em>]</em>) -- Bytes or byte values to show.</p></li>
+<li><p><strong>Length</strong> (<em>int</em>) -- Number of bytes to include.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The formatted dump, or a single space when <code class="docutils literal notranslate"><span class="pre">data</span></code> is empty.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">print(HexPrettyPrint(b&quot;EFI</span> <span class="pre">PART&quot;,</span> <span class="pre">8))</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.ptool.ReturnLow32bits">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.ptool.</span></span><span class="sig-name descname"><span class="pre">ReturnLow32bits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.ptool.ReturnLow32bits" title="Link to this definition">¶</a></dt>
+<dd><p>Return the low 32 bits of an integer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>var</strong> (<em>int</em>) -- Value to mask.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">var</span> <span class="pre">&amp;</span> <span class="pre">0xFFFFFFFF</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">ReturnLow32bits(0x123456789)</span></code> returns <code class="docutils literal notranslate"><span class="pre">0x23456789</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.ptool.ReturnHigh32bits">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.ptool.</span></span><span class="sig-name descname"><span class="pre">ReturnHigh32bits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.ptool.ReturnHigh32bits" title="Link to this definition">¶</a></dt>
+<dd><p>Return bits 32 to 63 of an integer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>var</strong> (<em>int</em>) -- Value to shift and mask.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">(var</span> <span class="pre">&gt;&gt;</span> <span class="pre">32)</span> <span class="pre">&amp;</span> <span class="pre">0xFFFFFFFF</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">ReturnHigh32bits(0x123456789)</span></code> returns <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.ptool.PrintBanner">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.ptool.</span></span><span class="sig-name descname"><span class="pre">PrintBanner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sz</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.ptool.PrintBanner" title="Link to this definition">¶</a></dt>
+<dd><p>Print a message between two lines of <code class="docutils literal notranslate"><span class="pre">=</span></code> characters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sz</strong> (<em>str</em>) -- Message to print.</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">PrintBanner(&quot;Basic</span> <span class="pre">Usage&quot;)</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.ptool.ShowUsage">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.ptool.</span></span><span class="sig-name descname"><span class="pre">ShowUsage</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.ptool.ShowUsage" title="Link to this definition">¶</a></dt>
+<dd><p>Print the ptool command-line usage.</p>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">qcom-ptool</span> <span class="pre">ptool</span></code> without <code class="docutils literal notranslate"><span class="pre">-x</span></code> prints this text.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.ptool.CreateFinalPartitionBin">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.ptool.</span></span><span class="sig-name descname"><span class="pre">CreateFinalPartitionBin</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.ptool.CreateFinalPartitionBin" title="Link to this definition">¶</a></dt>
+<dd><p>Join <code class="docutils literal notranslate"><span class="pre">partition0.bin</span></code> to <code class="docutils literal notranslate"><span class="pre">partition2.bin</span></code> into <code class="docutils literal notranslate"><span class="pre">partition.bin</span></code>.</p>
+<p>Each part is padded with zeros to 8192 bytes; missing parts become zeros.</p>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">CreateFinalPartitionBin()</span></code> runs after an MBR table is created.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.ptool.prettify">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.ptool.</span></span><span class="sig-name descname"><span class="pre">prettify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elem</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.ptool.prettify" title="Link to this definition">¶</a></dt>
+<dd><p>Return a pretty-printed XML string for the Element.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>elem</strong> (<em>xml.etree.ElementTree.Element</em>) -- Element to format.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Indented XML text with an XML declaration.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">prettify(Element(&quot;data&quot;))</span></code> returns an XML declaration line followed by <code class="docutils literal notranslate"><span class="pre">&lt;data/&gt;</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.ptool.UpdatePartitionTable">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.ptool.</span></span><span class="sig-name descname"><span class="pre">UpdatePartitionTable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Bootable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">StartSector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Record</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.ptool.UpdatePartitionTable" title="Link to this definition">¶</a></dt>
+<dd><p>Write one 16-byte MBR partition entry into a record.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Bootable</strong> (<em>str</em>) -- <code class="docutils literal notranslate"><span class="pre">&quot;true&quot;</span></code> to set the boot indicator.</p></li>
+<li><p><strong>Type</strong> (<em>int</em><em> | </em><em>str</em>) -- Partition type accepted by <a class="reference internal" href="#qcom_ptool.ptool.ValidateTYPE" title="qcom_ptool.ptool.ValidateTYPE"><code class="xref py py-func docutils literal notranslate"><span class="pre">ValidateTYPE()</span></code></a>.</p></li>
+<li><p><strong>StartSector</strong> (<em>int</em>) -- First sector of the partition.</p></li>
+<li><p><strong>Size</strong> (<em>int</em>) -- Partition size in sectors.</p></li>
+<li><p><strong>Offset</strong> (<em>int</em>) -- Byte offset of the entry within <code class="docutils literal notranslate"><span class="pre">Record</span></code>.</p></li>
+<li><p><strong>Record</strong> (<em>list</em><em>[</em><em>int</em><em>]</em>) -- MBR or EBR byte list changed in place.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">Record</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[int]</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>SystemExit</strong> -- With status 1 when <code class="docutils literal notranslate"><span class="pre">Type</span></code> is invalid.</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">UpdatePartitionTable(&quot;false&quot;,</span> <span class="pre">&quot;0x0C&quot;,</span> <span class="pre">2048,</span> <span class="pre">4096,</span> <span class="pre">446,</span> <span class="pre">MBR)</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.ptool.CreateMBRPartitionTable">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.ptool.</span></span><span class="sig-name descname"><span class="pre">CreateMBRPartitionTable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">PhysicalPartitionNumber</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.ptool.CreateMBRPartitionTable" title="Link to this definition">¶</a></dt>
+<dd><p>Build the MBR, EBR, rawprogram and patch files for one physical partition.</p>
+<p>Up to four partitions fit in the MBR; more partitions use an extended partition
+with one EBR each.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>PhysicalPartitionNumber</strong> (<em>int</em>) -- Physical partition (LUN) number <code class="docutils literal notranslate"><span class="pre">N</span></code>.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>SystemExit</strong> -- When physical partition <code class="docutils literal notranslate"><span class="pre">N</span></code> does not exist.</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">CreateMBRPartitionTable(0)</span></code> writes <code class="docutils literal notranslate"><span class="pre">MBR0.bin</span></code>, <code class="docutils literal notranslate"><span class="pre">EBR0.bin</span></code> and <code class="docutils literal notranslate"><span class="pre">rawprogram0.xml</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.ptool.CreateMasterBootRecord">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.ptool.</span></span><span class="sig-name descname"><span class="pre">CreateMasterBootRecord</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">NumMBRPartitions</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.ptool.CreateMasterBootRecord" title="Link to this definition">¶</a></dt>
+<dd><p>Fill the global <code class="docutils literal notranslate"><span class="pre">MBR</span></code> with a disk signature and primary partition entries.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>k</strong> (<em>int</em>) -- Physical partition (LUN) number.</p></li>
+<li><p><strong>NumMBRPartitions</strong> (<em>int</em>) -- Number of partitions placed in the MBR.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">CreateMasterBootRecord(0,</span> <span class="pre">3)</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.ptool.CreateExtendedBootRecords">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.ptool.</span></span><span class="sig-name descname"><span class="pre">CreateExtendedBootRecords</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">NumEBRPartitions</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.ptool.CreateExtendedBootRecords" title="Link to this definition">¶</a></dt>
+<dd><p>Add the extended partition to the MBR and build its chain of EBRs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>k</strong> (<em>int</em>) -- Physical partition (LUN) number.</p></li>
+<li><p><strong>NumEBRPartitions</strong> (<em>int</em>) -- Number of logical partitions to place in EBRs.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">CreateExtendedBootRecords(0,</span> <span class="pre">5)</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.ptool.ReturnNumSectorsTillBoundary">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.ptool.</span></span><span class="sig-name descname"><span class="pre">ReturnNumSectorsTillBoundary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">CurrentLBA</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">BoundaryInKB</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.ptool.ReturnNumSectorsTillBoundary" title="Link to this definition">¶</a></dt>
+<dd><p>Return the sectors needed to reach the next alignment boundary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>CurrentLBA</strong> (<em>int</em>) -- Current sector.</p></li>
+<li><p><strong>BoundaryInKB</strong> (<em>int</em>) -- Boundary in kilobytes; 0 disables alignment.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Sectors to add, or 0 when already aligned.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">ReturnNumSectorsTillBoundary(129024,</span> <span class="pre">65536)</span></code> returns <code class="docutils literal notranslate"><span class="pre">2048</span></code> with 512-byte sectors.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.ptool.WriteMBR">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.ptool.</span></span><span class="sig-name descname"><span class="pre">WriteMBR</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.ptool.WriteMBR" title="Link to this definition">¶</a></dt>
+<dd><p>Write the global <code class="docutils literal notranslate"><span class="pre">MBR</span></code> bytes to the open global <code class="docutils literal notranslate"><span class="pre">opfile</span></code>.</p>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">WriteMBR()</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.ptool.WriteEBR">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.ptool.</span></span><span class="sig-name descname"><span class="pre">WriteEBR</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.ptool.WriteEBR" title="Link to this definition">¶</a></dt>
+<dd><p>Write the global <code class="docutils literal notranslate"><span class="pre">EBR</span></code> bytes to the open global <code class="docutils literal notranslate"><span class="pre">opfile</span></code>.</p>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">WriteEBR()</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.ptool.find_file">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.ptool.</span></span><span class="sig-name descname"><span class="pre">find_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">search_paths</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.ptool.find_file" title="Link to this definition">¶</a></dt>
+<dd><p>Find a file in the search paths, then in the current directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) -- File name or path to find.</p></li>
+<li><p><strong>search_paths</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) -- Directories searched before the current directory.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The path found, or <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str | None</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">find_file(&quot;partitions.xml&quot;,</span> <span class="pre">[&quot;platforms/qcs6490-rb3gen2/ufs&quot;])</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.ptool.InitializeXMLFileVars">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.ptool.</span></span><span class="sig-name descname"><span class="pre">InitializeXMLFileVars</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.ptool.InitializeXMLFileVars" title="Link to this definition">¶</a></dt>
+<dd><p>Create empty rawprogram, patch and lock-region XML trees for one physical partition.</p>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">InitializeXMLFileVars()</span></code> runs before each <a class="reference internal" href="#qcom_ptool.ptool.CreateGPTPartitionTable" title="qcom_ptool.ptool.CreateGPTPartitionTable"><code class="xref py py-func docutils literal notranslate"><span class="pre">CreateGPTPartitionTable()</span></code></a> call.</p>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../README.html">qcom-ptool</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../user/README.html">User documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../README.html">Contributor documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../CONTRIBUTING.html">Contributing to qcom-ptool</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../DEVELOPMENT.html">Set up your development environment</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../README.html#function-reference">Function reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href=".github-test_reference_coverage.py.html">.github/test_reference_coverage.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="degpt-src-lib.rs.html">degpt/src/lib.rs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="degpt-src-main.rs.html">degpt/src/main.rs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="degpt-src-mygpt-header.rs.html">degpt/src/mygpt/header.rs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="degpt-src-mygpt-partition.rs.html">degpt/src/mygpt/partition.rs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="degpt-src-mygpt.rs.html">degpt/src/mygpt.rs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-board.py.html">qcom_ptool/board.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-cli.py.html">qcom_ptool/cli.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-gen_contents.py.html">qcom_ptool/gen_contents.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-gen_partition.py.html">qcom_ptool/gen_partition.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-gen_udev_rules.py.html">qcom_ptool/gen_udev_rules.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-loaders-__init__.py.html">qcom_ptool/loaders/__init__.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-loaders-conf.py.html">qcom_ptool/loaders/conf.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-loaders-yaml.py.html">qcom_ptool/loaders/yaml.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-msp.py.html">qcom_ptool/msp.py</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">qcom_ptool/ptool.py</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.ptool.ShowPartitionExample"><code class="docutils literal notranslate"><span class="pre">ShowPartitionExample()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.ptool.ConvertKBtoSectors"><code class="docutils literal notranslate"><span class="pre">ConvertKBtoSectors()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.ptool.UpdatePatch"><code class="docutils literal notranslate"><span class="pre">UpdatePatch()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.ptool.UpdateRawProgram"><code class="docutils literal notranslate"><span class="pre">UpdateRawProgram()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.ptool.ValidGUIDForm"><code class="docutils literal notranslate"><span class="pre">ValidGUIDForm()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.ptool.ValidateTYPE"><code class="docutils literal notranslate"><span class="pre">ValidateTYPE()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.ptool.ValidateGUID"><code class="docutils literal notranslate"><span class="pre">ValidateGUID()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.ptool.WriteGPT"><code class="docutils literal notranslate"><span class="pre">WriteGPT()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.ptool.FillInEmptyGPT"><code class="docutils literal notranslate"><span class="pre">FillInEmptyGPT()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.ptool.UpdatePrimaryGPT"><code class="docutils literal notranslate"><span class="pre">UpdatePrimaryGPT()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.ptool.UpdateBackupGPT"><code class="docutils literal notranslate"><span class="pre">UpdateBackupGPT()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.ptool.ShowBackupGPT"><code class="docutils literal notranslate"><span class="pre">ShowBackupGPT()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.ptool.CreateFileOfZeros"><code class="docutils literal notranslate"><span class="pre">CreateFileOfZeros()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.ptool.CreateErasingRawProgramFiles"><code class="docutils literal notranslate"><span class="pre">CreateErasingRawProgramFiles()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.ptool.CreateGPTPartitionTable"><code class="docutils literal notranslate"><span class="pre">CreateGPTPartitionTable()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.ptool.AlignVariablesToEqualSigns"><code class="docutils literal notranslate"><span class="pre">AlignVariablesToEqualSigns()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.ptool.ReturnArrayFromSpaceSeparatedList"><code class="docutils literal notranslate"><span class="pre">ReturnArrayFromSpaceSeparatedList()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.ptool.ParseXML"><code class="docutils literal notranslate"><span class="pre">ParseXML()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.ptool.ValidatePartitions"><code class="docutils literal notranslate"><span class="pre">ValidatePartitions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.ptool.PrintPartitionCollection"><code class="docutils literal notranslate"><span class="pre">PrintPartitionCollection()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.ptool.ParseCommandLine"><code class="docutils literal notranslate"><span class="pre">ParseCommandLine()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.ptool.UpdateWPhash"><code class="docutils literal notranslate"><span class="pre">UpdateWPhash()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.ptool.HexPrettyPrint"><code class="docutils literal notranslate"><span class="pre">HexPrettyPrint()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.ptool.ReturnLow32bits"><code class="docutils literal notranslate"><span class="pre">ReturnLow32bits()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.ptool.ReturnHigh32bits"><code class="docutils literal notranslate"><span class="pre">ReturnHigh32bits()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.ptool.PrintBanner"><code class="docutils literal notranslate"><span class="pre">PrintBanner()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.ptool.ShowUsage"><code class="docutils literal notranslate"><span class="pre">ShowUsage()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.ptool.CreateFinalPartitionBin"><code class="docutils literal notranslate"><span class="pre">CreateFinalPartitionBin()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.ptool.prettify"><code class="docutils literal notranslate"><span class="pre">prettify()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.ptool.UpdatePartitionTable"><code class="docutils literal notranslate"><span class="pre">UpdatePartitionTable()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.ptool.CreateMBRPartitionTable"><code class="docutils literal notranslate"><span class="pre">CreateMBRPartitionTable()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.ptool.CreateMasterBootRecord"><code class="docutils literal notranslate"><span class="pre">CreateMasterBootRecord()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.ptool.CreateExtendedBootRecords"><code class="docutils literal notranslate"><span class="pre">CreateExtendedBootRecords()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.ptool.ReturnNumSectorsTillBoundary"><code class="docutils literal notranslate"><span class="pre">ReturnNumSectorsTillBoundary()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.ptool.WriteMBR"><code class="docutils literal notranslate"><span class="pre">WriteMBR()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.ptool.WriteEBR"><code class="docutils literal notranslate"><span class="pre">WriteEBR()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.ptool.find_file"><code class="docutils literal notranslate"><span class="pre">find_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.ptool.InitializeXMLFileVars"><code class="docutils literal notranslate"><span class="pre">InitializeXMLFileVars()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-show.py.html">qcom_ptool/show.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-spec.py.html">qcom_ptool/spec.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-utils.py.html">qcom_ptool/utils.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests-unit-test_board.py.html">tests/unit/test_board.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests-unit-test_cli.py.html">tests/unit/test_cli.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests-unit-test_cli_board.py.html">tests/unit/test_cli_board.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests-unit-test_gen_partition.py.html">tests/unit/test_gen_partition.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests-unit-test_gen_udev_rules.py.html">tests/unit/test_gen_udev_rules.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests-unit-test_loaders_conf.py.html">tests/unit/test_loaders_conf.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests-unit-test_loaders_yaml.py.html">tests/unit/test_loaders_yaml.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests-unit-test_utils.py.html">tests/unit/test_utils.py</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../README.html#files">Files</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../README.html">Documentation overview</a><ul>
+  <li><a href="../README.html">Contributor documentation</a><ul>
+      <li>Previous: <a href="qcom_ptool-msp.py.html" title="previous chapter">qcom_ptool/msp.py</a></li>
+      <li>Next: <a href="qcom_ptool-show.py.html" title="next chapter">qcom_ptool/show.py</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      
+      
+      
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

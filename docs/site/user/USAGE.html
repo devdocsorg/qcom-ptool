@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Generate partition files for a board &#8212; qcom-ptool  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <script src="../_static/documentation_options.js?v=dd1dafa6"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Configuration reference" href="CONFIGURATION.html" />
+    <link rel="prev" title="User documentation" href="README.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="generate-partition-files-for-a-board">
+<h1>Generate partition files for a board<a class="headerlink" href="#generate-partition-files-for-a-board" title="Link to this heading">¶</a></h1>
+<p>This tutorial turns the RB3 Gen 2 UFS layout into GPT images, the rawprogram and
+patch files that flashing tools read, and a <code class="docutils literal notranslate"><span class="pre">contents.xml</span></code> build description.</p>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>A checkout of this repository, which supplies the layouts under
+<a class="reference external" href="https://github.com/devdocsorg/qcom-ptool/tree/docs/repository-documentation/platforms">platforms/</a>.</p></li>
+<li><p>qcom-ptool installed as described under <a class="reference external" href="https://github.com/devdocsorg/qcom-ptool/blob/docs/repository-documentation/README.md#installation">Installation</a>;
+<code class="docutils literal notranslate"><span class="pre">qcom-ptool</span> <span class="pre">-V</span></code> prints its version.</p></li>
+</ul>
+</section>
+<section id="choose-a-layout-and-an-output-folder">
+<h2>1. Choose a layout and an output folder<a class="headerlink" href="#choose-a-layout-and-an-output-folder" title="Link to this heading">¶</a></h2>
+<p>Each <code class="docutils literal notranslate"><span class="pre">platforms/&lt;board&gt;/&lt;storage&gt;/</span></code> folder holds one storage layout. This tutorial
+uses <a class="reference external" href="https://github.com/devdocsorg/qcom-ptool/tree/docs/repository-documentation/platforms/qcs6490-rb3gen2/ufs">platforms/qcs6490-rb3gen2/ufs</a>. From the
+checkout root:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nv">PTOOL_DIR</span><span class="o">=</span><span class="nv">$PWD</span>
+mkdir<span class="w"> </span>-p<span class="w"> </span>~/rb3gen2-ufs<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>~/rb3gen2-ufs
+</pre></div>
+</div>
+</section>
+<section id="generate-the-partition-xml">
+<h2>2. Generate the partition XML<a class="headerlink" href="#generate-the-partition-xml" title="Link to this heading">¶</a></h2>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>qcom-ptool<span class="w"> </span>gen_partition<span class="w"> </span>-i<span class="w"> </span><span class="s2">"</span><span class="nv">$PTOOL_DIR</span><span class="s2">/platforms/qcs6490-rb3gen2/ufs/partitions.conf"</span><span class="w"> </span>-o<span class="w"> </span>partitions.xml
+</pre></div>
+</div>
+<p>The command prints <code class="docutils literal notranslate"><span class="pre">Generating</span> <span class="pre">UFS</span> <span class="pre">XML</span> <span class="pre">partitions.xml</span></code> and writes one
+<code class="docutils literal notranslate"><span class="pre">physical_partition</span></code> element per UFS LUN.</p>
+</section>
+<section id="generate-the-gpt-images-and-flashing-xml">
+<h2>3. Generate the GPT images and flashing XML<a class="headerlink" href="#generate-the-gpt-images-and-flashing-xml" title="Link to this heading">¶</a></h2>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>qcom-ptool<span class="w"> </span>ptool<span class="w"> </span>-x<span class="w"> </span>partitions.xml
+</pre></div>
+</div>
+<p>For each LUN <code class="docutils literal notranslate"><span class="pre">N</span></code>, ptool writes <code class="docutils literal notranslate"><span class="pre">gpt_mainN.bin</span></code>, <code class="docutils literal notranslate"><span class="pre">gpt_backupN.bin</span></code>,
+<code class="docutils literal notranslate"><span class="pre">gpt_bothN.bin</span></code>, <code class="docutils literal notranslate"><span class="pre">gpt_emptyN.bin</span></code>, <code class="docutils literal notranslate"><span class="pre">rawprogramN.xml</span></code>, <code class="docutils literal notranslate"><span class="pre">patchN.xml</span></code>,
+<code class="docutils literal notranslate"><span class="pre">rawprogramN_BLANK_GPT.xml</span></code> and <code class="docutils literal notranslate"><span class="pre">rawprogramN_WIPE_PARTITIONS.xml</span></code>. It also writes
+<code class="docutils literal notranslate"><span class="pre">wipe_rawprogram_PHY*.xml</span></code> and the <code class="docutils literal notranslate"><span class="pre">zeros_*.bin</span></code> files they use, and ends with
+<code class="docutils literal notranslate"><span class="pre">NOTE:</span> <span class="pre">All</span> <span class="pre">Physical</span> <span class="pre">Partitions</span> <span class="pre">/</span> <span class="pre">LUNs</span> <span class="pre">were</span> <span class="pre">created</span></code>. Disk and partition GUIDs are
+random unless <code class="docutils literal notranslate"><span class="pre">PTOOL_SEED</span></code> is set.</p>
+</section>
+<section id="generate-contents-xml">
+<h2>4. Generate contents.xml<a class="headerlink" href="#generate-contents-xml" title="Link to this heading">¶</a></h2>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>qcom-ptool<span class="w"> </span>gen_contents<span class="w"> </span>-p<span class="w"> </span>partitions.xml<span class="w"> </span>-t<span class="w"> </span><span class="s2">"</span><span class="nv">$PTOOL_DIR</span><span class="s2">/platforms/qcs6490-rb3gen2/ufs/contents.xml.in"</span><span class="w"> </span>-o<span class="w"> </span>contents.xml
+</pre></div>
+</div>
+<p>Add <code class="docutils literal notranslate"><span class="pre">-b</span> <span class="pre">&lt;build-id&gt;</span></code> to record a build ID. <code class="docutils literal notranslate"><span class="pre">contents.xml</span></code> lists each partition
+image, GPT file, rawprogram file, and patch file for the <code class="docutils literal notranslate"><span class="pre">common</span></code> build.</p>
+</section>
+<section id="expected-result">
+<h2>Expected result<a class="headerlink" href="#expected-result" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">~/rb3gen2-ufs</span></code> holds <code class="docutils literal notranslate"><span class="pre">partitions.xml</span></code>, <code class="docutils literal notranslate"><span class="pre">contents.xml</span></code>, and the files from step 3.
+A flashing tool reads <code class="docutils literal notranslate"><span class="pre">rawprogramN.xml</span></code> and <code class="docutils literal notranslate"><span class="pre">patchN.xml</span></code> together with the images
+they name; flashing a board is outside this tutorial.</p>
+<p>Boards under <code class="docutils literal notranslate"><span class="pre">platforms/boards/</span></code> are YAML files that describe every storage at
+once; generate them with <code class="docutils literal notranslate"><span class="pre">qcom-ptool</span> <span class="pre">gen_partition</span> <span class="pre">--board</span> <span class="pre">&lt;file&gt;</span> <span class="pre">-C</span> <span class="pre">&lt;folder&gt;</span></code>. To
+build every layout inside the checkout, run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">all</span></code>.</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../README.html">qcom-ptool</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="README.html">User documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Generate partition files for a board</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#choose-a-layout-and-an-output-folder">1. Choose a layout and an output folder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#generate-the-partition-xml">2. Generate the partition XML</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#generate-the-gpt-images-and-flashing-xml">3. Generate the GPT images and flashing XML</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#generate-contents-xml">4. Generate contents.xml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#expected-result">Expected result</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="CONFIGURATION.html">Configuration reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="README.html#files">Files</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing/README.html">Contributor documentation</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../README.html">Documentation overview</a><ul>
+  <li><a href="README.html">User documentation</a><ul>
+      <li>Previous: <a href="README.html" title="previous chapter">User documentation</a></li>
+      <li>Next: <a href="CONFIGURATION.html" title="next chapter">Configuration reference</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      
+      
+      
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

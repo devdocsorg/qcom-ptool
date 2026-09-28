@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>qcom_ptool/msp.py &#8212; qcom-ptool  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <script src="../../_static/documentation_options.js?v=dd1dafa6"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="qcom_ptool/ptool.py" href="qcom_ptool-ptool.py.html" />
+    <link rel="prev" title="qcom_ptool/loaders/yaml.py" href="qcom_ptool-loaders-yaml.py.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="qcom-ptool-msp-py">
+<h1>qcom_ptool/msp.py<a class="headerlink" href="#qcom-ptool-msp-py" title="Link to this heading">¶</a></h1>
+<p><a class="reference external" href="https://github.com/devdocsorg/qcom-ptool/blob/docs/repository-documentation/qcom_ptool/msp.py">Source</a></p>
+<dl class="py function" id="module-qcom_ptool.msp">
+<dt class="sig sig-object py" id="qcom_ptool.msp.reset_device_log">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.msp.</span></span><span class="sig-name descname"><span class="pre">reset_device_log</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.msp.reset_device_log" title="Link to this definition">¶</a></dt>
+<dd><p>Create an empty <code class="docutils literal notranslate"><span class="pre">log_msp.txt</span></code> in the current directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>SystemExit</strong> -- When the log file cannot be created.</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">reset_device_log()</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.msp.device_log">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.msp.</span></span><span class="sig-name descname"><span class="pre">device_log</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">display</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.msp.device_log" title="Link to this definition">¶</a></dt>
+<dd><p>Append a time-stamped message to <code class="docutils literal notranslate"><span class="pre">log_msp.txt</span></code> and optionally print it.</p>
+<p>Write failures print an error and are otherwise ignored.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> (<em>str</em>) -- Text to log.</p></li>
+<li><p><strong>display</strong> (<em>int</em>) -- 1 to also print the message.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">device_log(&quot;Writing</span> <span class="pre">rawprogram0.xml&quot;,</span> <span class="pre">display=0)</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.msp.ReadSectors">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.msp.</span></span><span class="sig-name descname"><span class="pre">ReadSectors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">opfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">NumSectors</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.msp.ReadSectors" title="Link to this definition">¶</a></dt>
+<dd><p>Read whole sectors from an open file or device.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>opfile</strong> (<em>BinaryIO</em>) -- Open binary file or device.</p></li>
+<li><p><strong>NumSectors</strong> (<em>int</em>) -- Number of <code class="docutils literal notranslate"><span class="pre">SECTOR_SIZE</span></code> sectors to read.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The bytes read.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bytes</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>SystemExit</strong> -- With status 1 when the read fails.</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">ReadSectors(fp,</span> <span class="pre">1)</span></code> returns the first 512 bytes of <code class="docutils literal notranslate"><span class="pre">fp</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.msp.PrintBigWarning">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.msp.</span></span><span class="sig-name descname"><span class="pre">PrintBigWarning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sz</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.msp.PrintBigWarning" title="Link to this definition">¶</a></dt>
+<dd><p>Print and log a large WARNING banner with a message.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sz</strong> (<em>str</em>) -- Message printed after the banner.</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">PrintBigWarning(&quot;testsparse.py</span> <span class="pre">is</span> <span class="pre">not</span> <span class="pre">found&quot;)</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.msp.PrintBigError">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.msp.</span></span><span class="sig-name descname"><span class="pre">PrintBigError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sz</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.msp.PrintBigError" title="Link to this definition">¶</a></dt>
+<dd><p>Print and log a large ERROR banner, then exit when a message is supplied.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sz</strong> (<em>str</em>) -- Error message.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>SystemExit</strong> -- With status 1 when <code class="docutils literal notranslate"><span class="pre">sz</span></code> is not empty.</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">PrintBigError(&quot;Could</span> <span class="pre">not</span> <span class="pre">complete</span> <span class="pre">the</span> <span class="pre">read&quot;)</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.msp.PrettyPrintArray">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.msp.</span></span><span class="sig-name descname"><span class="pre">PrettyPrintArray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytes_read</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.msp.PrettyPrintArray" title="Link to this definition">¶</a></dt>
+<dd><p>Print bytes as hex and characters, one 512-byte sector at a time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>bytes_read</strong> (<em>bytes</em>) -- Bytes to print.</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">PrettyPrintArray(ReadSectors(fp,</span> <span class="pre">1))</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.msp.external_call">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.msp.</span></span><span class="sig-name descname"><span class="pre">external_call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capture_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.msp.external_call" title="Link to this definition">¶</a></dt>
+<dd><p>Run a shell command and return its output.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>command</strong> (<em>str</em>) -- Command line to run.</p></li>
+<li><p><strong>capture_output</strong> (<em>bool</em>) -- <code class="docutils literal notranslate"><span class="pre">True</span></code> to capture stdout and stderr; <code class="docutils literal notranslate"><span class="pre">False</span></code> runs it with
+<code class="xref py py-func docutils literal notranslate"><span class="pre">os.system()</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Captured standard output, or <code class="docutils literal notranslate"><span class="pre">None</span></code> when output is not captured.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bytes | None</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>SystemExit</strong> -- With status 1 when the command cannot be started.</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">external_call(&quot;sync&quot;)</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.msp.HandleNUM_DISK_SECTORS">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.msp.</span></span><span class="sig-name descname"><span class="pre">HandleNUM_DISK_SECTORS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.msp.HandleNUM_DISK_SECTORS" title="Link to this definition">¶</a></dt>
+<dd><p>Replace <code class="docutils literal notranslate"><span class="pre">NUM_DISK_SECTORS</span></code> expressions with sector numbers.</p>
+<p>When the disk size is not known yet, the value is placed beyond the largest
+supported disk so entries sort after absolute sectors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>field</strong> (<em>str</em><em> | </em><em>int</em>) -- Value such as <code class="docutils literal notranslate"><span class="pre">&quot;NUM_DISK_SECTORS-33.&quot;</span></code>, or a number.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The sector number, or <code class="docutils literal notranslate"><span class="pre">field</span></code> unchanged when it is already a number.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int | str</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">HandleNUM_DISK_SECTORS(34)</span></code> returns <code class="docutils literal notranslate"><span class="pre">34</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.msp.ReturnParsedValues">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.msp.</span></span><span class="sig-name descname"><span class="pre">ReturnParsedValues</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.msp.ReturnParsedValues" title="Link to this definition">¶</a></dt>
+<dd><p>Read the attributes of a rawprogram or patch element with defaults.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>element</strong> (<em>xml.etree.ElementTree.Element</em>) -- <code class="docutils literal notranslate"><span class="pre">program</span></code>, <code class="docutils literal notranslate"><span class="pre">patch</span></code> or <code class="docutils literal notranslate"><span class="pre">read</span></code> element.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Attribute values, with numbers converted to integers.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">ReturnParsedValues(program)[&quot;filename&quot;]</span></code> returns the image file name.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.msp.ParseXML">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.msp.</span></span><span class="sig-name descname"><span class="pre">ParseXML</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xml_filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.msp.ParseXML" title="Link to this definition">¶</a></dt>
+<dd><p>Load <code class="docutils literal notranslate"><span class="pre">read</span></code>, <code class="docutils literal notranslate"><span class="pre">program</span></code> and <code class="docutils literal notranslate"><span class="pre">patch</span></code> elements into the global lists.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>xml_filename</strong> (<em>str</em>) -- Rawprogram or patch XML file.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>SystemExit</strong> -- With status 1 when an element has no attributes.</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">ParseXML(&quot;rawprogram0.xml&quot;)</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.msp.ReturnArrayFromCommaSeparatedList">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.msp.</span></span><span class="sig-name descname"><span class="pre">ReturnArrayFromCommaSeparatedList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sz</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.msp.ReturnArrayFromCommaSeparatedList" title="Link to this definition">¶</a></dt>
+<dd><p>Split comma-separated text after normalising whitespace.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sz</strong> (<em>str</em>) -- Text to split.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The items in order.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[str]</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">ReturnArrayFromCommaSeparatedList(&quot;a.bin,b.bin&quot;)</span></code> returns <code class="docutils literal notranslate"><span class="pre">[&quot;a.bin&quot;,</span> <span class="pre">&quot;b.bin&quot;]</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.msp.find_file">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.msp.</span></span><span class="sig-name descname"><span class="pre">find_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">search_paths</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.msp.find_file" title="Link to this definition">¶</a></dt>
+<dd><p>Find a file in the search paths, then in the current directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) -- File name or path to find.</p></li>
+<li><p><strong>search_paths</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) -- Directories searched before the current directory.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The path found, or <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str | None</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">find_file(&quot;gpt_main0.bin&quot;,</span> <span class="pre">[&quot;platforms/qcs6490-rb3gen2/ufs&quot;])</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.msp.DoubleCheckDiskSize">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.msp.</span></span><span class="sig-name descname"><span class="pre">DoubleCheckDiskSize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.msp.DoubleCheckDiskSize" title="Link to this definition">¶</a></dt>
+<dd><p>Confirm the destination size reported by the operating system on Windows.</p>
+<p>Nothing is checked for <code class="docutils literal notranslate"><span class="pre">singleimage.bin</span></code>, with <code class="docutils literal notranslate"><span class="pre">-n</span></code>, or on Linux.</p>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">DoubleCheckDiskSize()</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.msp.PerformRead">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.msp.</span></span><span class="sig-name descname"><span class="pre">PerformRead</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.msp.PerformRead" title="Link to this definition">¶</a></dt>
+<dd><p>Read each <code class="docutils literal notranslate"><span class="pre">read</span></code> entry from the destination into its file.</p>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">PerformRead()</span></code> runs when the XML contains <code class="docutils literal notranslate"><span class="pre">read</span></code> elements.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.msp.PerformWrite">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.msp.</span></span><span class="sig-name descname"><span class="pre">PerformWrite</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.msp.PerformWrite" title="Link to this definition">¶</a></dt>
+<dd><p>Write each <code class="docutils literal notranslate"><span class="pre">program</span></code> entry's file to the destination.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>1 when an image larger than its partition was truncated, otherwise 0.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>SystemExit</strong> -- When an image cannot be opened or the destination cannot be written.</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">PerformWrite()</span></code> writes the images listed in <code class="docutils literal notranslate"><span class="pre">rawprogram0.xml</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.msp.GetPartitions">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.msp.</span></span><span class="sig-name descname"><span class="pre">GetPartitions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.msp.GetPartitions" title="Link to this definition">¶</a></dt>
+<dd><p>Record the disks the operating system reports in <code class="docutils literal notranslate"><span class="pre">AvailablePartitions</span></code>.</p>
+<p>On Linux this reads <code class="docutils literal notranslate"><span class="pre">/proc/partitions</span></code>; on Windows it queries the physical drives.</p>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">GetPartitions()</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.msp.PerformPatching">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.msp.</span></span><span class="sig-name descname"><span class="pre">PerformPatching</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.msp.PerformPatching" title="Link to this definition">¶</a></dt>
+<dd><p>Apply each <code class="docutils literal notranslate"><span class="pre">patch</span></code> entry to the destination or to a file.</p>
+<p>Patches to the disk require confirmation unless prompts are disabled.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>SystemExit</strong> -- When a patch cannot be applied.</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">PerformPatching()</span></code> updates the GPT CRCs listed in <code class="docutils literal notranslate"><span class="pre">patch0.xml</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.msp.Usage">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.msp.</span></span><span class="sig-name descname"><span class="pre">Usage</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.msp.Usage" title="Link to this definition">¶</a></dt>
+<dd><p>Print the msp command-line usage.</p>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">qcom-ptool</span> <span class="pre">msp</span></code> without options prints this text.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.msp.ReturnSizeString">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.msp.</span></span><span class="sig-name descname"><span class="pre">ReturnSizeString</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.msp.ReturnSizeString" title="Link to this definition">¶</a></dt>
+<dd><p>Format a size in bytes with a B, KB, MB or GB unit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>size</strong> (<em>int</em><em> | </em><em>float</em>) -- Size in bytes.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The size with two decimals for KB and larger units.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">ReturnSizeString(2048)</span></code> returns <code class="docutils literal notranslate"><span class="pre">&quot;2.00</span> <span class="pre">KB&quot;</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.msp.PrintResetDeviceNow">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.msp.</span></span><span class="sig-name descname"><span class="pre">PrintResetDeviceNow</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.msp.PrintResetDeviceNow" title="Link to this definition">¶</a></dt>
+<dd><p>Print and log a banner asking the user to reset the device.</p>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">PrintResetDeviceNow()</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.msp.TestIfSparse">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.msp.</span></span><span class="sig-name descname"><span class="pre">TestIfSparse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test_sparse</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filetotest</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.msp.TestIfSparse" title="Link to this definition">¶</a></dt>
+<dd><p>Run <code class="docutils literal notranslate"><span class="pre">testsparse.py</span></code> to warn when an image is a sparse image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>test_sparse</strong> (<em>str</em><em> | </em><em>None</em>) -- Path of <code class="docutils literal notranslate"><span class="pre">testsparse.py</span></code>, or <code class="docutils literal notranslate"><span class="pre">None</span></code> to only print a warning.</p></li>
+<li><p><strong>filetotest</strong> (<em>str</em>) -- Image file to check.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">TestIfSparse(None,</span> <span class="pre">&quot;rootfs.img&quot;)</span></code> prints that the check cannot run.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.msp.ReplaceDiskSizeInSectorsWithRealValue">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.msp.</span></span><span class="sig-name descname"><span class="pre">ReplaceDiskSizeInSectorsWithRealValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MyArray</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.msp.ReplaceDiskSizeInSectorsWithRealValue" title="Link to this definition">¶</a></dt>
+<dd><p>Replace placeholder sector values once the disk size is known.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>MyArray</strong> (<em>list</em><em>[</em><em>dict</em><em>]</em>) -- Parsed <code class="docutils literal notranslate"><span class="pre">program</span></code>, <code class="docutils literal notranslate"><span class="pre">patch</span></code> or <code class="docutils literal notranslate"><span class="pre">read</span></code> entries changed in place.</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">ReplaceDiskSizeInSectorsWithRealValue(WriteArray)</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qcom_ptool.msp.CalculateMinDiskSize">
+<span class="sig-prename descclassname"><span class="pre">qcom_ptool.msp.</span></span><span class="sig-name descname"><span class="pre">CalculateMinDiskSize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#qcom_ptool.msp.CalculateMinDiskSize" title="Link to this definition">¶</a></dt>
+<dd><p>Return the smallest disk size, in sectors, that fits the sorted writes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>End sector of the last write with an absolute start sector.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">CalculateMinDiskSize()</span></code> runs after the writes are sorted.</p>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../README.html">qcom-ptool</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../user/README.html">User documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../README.html">Contributor documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../CONTRIBUTING.html">Contributing to qcom-ptool</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../DEVELOPMENT.html">Set up your development environment</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../README.html#function-reference">Function reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href=".github-test_reference_coverage.py.html">.github/test_reference_coverage.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="degpt-src-lib.rs.html">degpt/src/lib.rs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="degpt-src-main.rs.html">degpt/src/main.rs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="degpt-src-mygpt-header.rs.html">degpt/src/mygpt/header.rs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="degpt-src-mygpt-partition.rs.html">degpt/src/mygpt/partition.rs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="degpt-src-mygpt.rs.html">degpt/src/mygpt.rs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-board.py.html">qcom_ptool/board.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-cli.py.html">qcom_ptool/cli.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-gen_contents.py.html">qcom_ptool/gen_contents.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-gen_partition.py.html">qcom_ptool/gen_partition.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-gen_udev_rules.py.html">qcom_ptool/gen_udev_rules.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-loaders-__init__.py.html">qcom_ptool/loaders/__init__.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-loaders-conf.py.html">qcom_ptool/loaders/conf.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-loaders-yaml.py.html">qcom_ptool/loaders/yaml.py</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">qcom_ptool/msp.py</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.msp.reset_device_log"><code class="docutils literal notranslate"><span class="pre">reset_device_log()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.msp.device_log"><code class="docutils literal notranslate"><span class="pre">device_log()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.msp.ReadSectors"><code class="docutils literal notranslate"><span class="pre">ReadSectors()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.msp.PrintBigWarning"><code class="docutils literal notranslate"><span class="pre">PrintBigWarning()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.msp.PrintBigError"><code class="docutils literal notranslate"><span class="pre">PrintBigError()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.msp.PrettyPrintArray"><code class="docutils literal notranslate"><span class="pre">PrettyPrintArray()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.msp.external_call"><code class="docutils literal notranslate"><span class="pre">external_call()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.msp.HandleNUM_DISK_SECTORS"><code class="docutils literal notranslate"><span class="pre">HandleNUM_DISK_SECTORS()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.msp.ReturnParsedValues"><code class="docutils literal notranslate"><span class="pre">ReturnParsedValues()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.msp.ParseXML"><code class="docutils literal notranslate"><span class="pre">ParseXML()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.msp.ReturnArrayFromCommaSeparatedList"><code class="docutils literal notranslate"><span class="pre">ReturnArrayFromCommaSeparatedList()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.msp.find_file"><code class="docutils literal notranslate"><span class="pre">find_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.msp.DoubleCheckDiskSize"><code class="docutils literal notranslate"><span class="pre">DoubleCheckDiskSize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.msp.PerformRead"><code class="docutils literal notranslate"><span class="pre">PerformRead()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.msp.PerformWrite"><code class="docutils literal notranslate"><span class="pre">PerformWrite()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.msp.GetPartitions"><code class="docutils literal notranslate"><span class="pre">GetPartitions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.msp.PerformPatching"><code class="docutils literal notranslate"><span class="pre">PerformPatching()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.msp.Usage"><code class="docutils literal notranslate"><span class="pre">Usage()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.msp.ReturnSizeString"><code class="docutils literal notranslate"><span class="pre">ReturnSizeString()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.msp.PrintResetDeviceNow"><code class="docutils literal notranslate"><span class="pre">PrintResetDeviceNow()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.msp.TestIfSparse"><code class="docutils literal notranslate"><span class="pre">TestIfSparse()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.msp.ReplaceDiskSizeInSectorsWithRealValue"><code class="docutils literal notranslate"><span class="pre">ReplaceDiskSizeInSectorsWithRealValue()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qcom_ptool.msp.CalculateMinDiskSize"><code class="docutils literal notranslate"><span class="pre">CalculateMinDiskSize()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-ptool.py.html">qcom_ptool/ptool.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-show.py.html">qcom_ptool/show.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-spec.py.html">qcom_ptool/spec.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-utils.py.html">qcom_ptool/utils.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests-unit-test_board.py.html">tests/unit/test_board.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests-unit-test_cli.py.html">tests/unit/test_cli.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests-unit-test_cli_board.py.html">tests/unit/test_cli_board.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests-unit-test_gen_partition.py.html">tests/unit/test_gen_partition.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests-unit-test_gen_udev_rules.py.html">tests/unit/test_gen_udev_rules.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests-unit-test_loaders_conf.py.html">tests/unit/test_loaders_conf.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests-unit-test_loaders_yaml.py.html">tests/unit/test_loaders_yaml.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests-unit-test_utils.py.html">tests/unit/test_utils.py</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../README.html#files">Files</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../README.html">Documentation overview</a><ul>
+  <li><a href="../README.html">Contributor documentation</a><ul>
+      <li>Previous: <a href="qcom_ptool-loaders-yaml.py.html" title="previous chapter">qcom_ptool/loaders/yaml.py</a></li>
+      <li>Next: <a href="qcom_ptool-ptool.py.html" title="next chapter">qcom_ptool/ptool.py</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      
+      
+      
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

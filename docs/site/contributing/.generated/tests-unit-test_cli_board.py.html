@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>tests/unit/test_cli_board.py &#8212; qcom-ptool  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <script src="../../_static/documentation_options.js?v=dd1dafa6"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="tests/unit/test_gen_partition.py" href="tests-unit-test_gen_partition.py.html" />
+    <link rel="prev" title="tests/unit/test_cli.py" href="tests-unit-test_cli.py.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="tests-unit-test-cli-board-py">
+<h1>tests/unit/test_cli_board.py<a class="headerlink" href="#tests-unit-test-cli-board-py" title="Link to this heading">¶</a></h1>
+<p><a class="reference external" href="https://github.com/devdocsorg/qcom-ptool/blob/docs/repository-documentation/tests/unit/test_cli_board.py">Source</a></p>
+<p id="module-unit.test_cli_board">CLI tests for board-mode <code class="docutils literal notranslate"><span class="pre">gen_partition</span></code> and the <code class="docutils literal notranslate"><span class="pre">show</span></code> subcommand.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="unit.test_cli_board._board">
+<span class="sig-prename descclassname"><span class="pre">unit.test_cli_board.</span></span><span class="sig-name descname"><span class="pre">_board</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tmp_path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#unit.test_cli_board._board" title="Link to this definition">¶</a></dt>
+<dd><p>Write the demo board file below a temporary <code class="docutils literal notranslate"><span class="pre">platforms/boards</span></code> directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tmp_path</strong> (<em>pathlib.Path</em>) -- Temporary directory for test files.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Path of the board file.</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">_board(tmp_path)</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="unit.test_cli_board.test_board_mode_emits_one_xml_per_storage">
+<span class="sig-prename descclassname"><span class="pre">unit.test_cli_board.</span></span><span class="sig-name descname"><span class="pre">test_board_mode_emits_one_xml_per_storage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tmp_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#unit.test_cli_board.test_board_mode_emits_one_xml_per_storage" title="Link to this definition">¶</a></dt>
+<dd><p>Check that <code class="docutils literal notranslate"><span class="pre">--board</span></code> writes one XML file per storage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tmp_path</strong> (<em>pathlib.Path</em>) -- Temporary directory for test files.</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">pytest</span> <span class="pre">tests/unit/test_cli_board.py::test_board_mode_emits_one_xml_per_storage</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="unit.test_cli_board.test_board_mode_output_count_mismatch_returns_1">
+<span class="sig-prename descclassname"><span class="pre">unit.test_cli_board.</span></span><span class="sig-name descname"><span class="pre">test_board_mode_output_count_mismatch_returns_1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tmp_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#unit.test_cli_board.test_board_mode_output_count_mismatch_returns_1" title="Link to this definition">¶</a></dt>
+<dd><p>Check that <code class="docutils literal notranslate"><span class="pre">--board</span></code> returns 1 when the output count differs from the storage count.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tmp_path</strong> (<em>pathlib.Path</em>) -- Temporary directory for test files.</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">pytest</span> <span class="pre">tests/unit/test_cli_board.py::test_board_mode_output_count_mismatch_returns_1</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="unit.test_cli_board.test_requires_exactly_one_source">
+<span class="sig-prename descclassname"><span class="pre">unit.test_cli_board.</span></span><span class="sig-name descname"><span class="pre">test_requires_exactly_one_source</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tmp_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#unit.test_cli_board.test_requires_exactly_one_source" title="Link to this definition">¶</a></dt>
+<dd><p>Check that <code class="docutils literal notranslate"><span class="pre">-i</span></code> and <code class="docutils literal notranslate"><span class="pre">--board</span></code> together are rejected.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tmp_path</strong> (<em>pathlib.Path</em>) -- Temporary directory for test files.</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">pytest</span> <span class="pre">tests/unit/test_cli_board.py::test_requires_exactly_one_source</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="unit.test_cli_board.test_legacy_single_storage_still_works">
+<span class="sig-prename descclassname"><span class="pre">unit.test_cli_board.</span></span><span class="sig-name descname"><span class="pre">test_legacy_single_storage_still_works</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tmp_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#unit.test_cli_board.test_legacy_single_storage_still_works" title="Link to this definition">¶</a></dt>
+<dd><p>Check that <code class="docutils literal notranslate"><span class="pre">-i</span></code> with a single-storage YAML file still writes XML.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tmp_path</strong> (<em>pathlib.Path</em>) -- Temporary directory for test files.</p>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">pytest</span> <span class="pre">tests/unit/test_cli_board.py::test_legacy_single_storage_still_works</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="unit.test_cli_board.test_show_prints_resolved_spec">
+<span class="sig-prename descclassname"><span class="pre">unit.test_cli_board.</span></span><span class="sig-name descname"><span class="pre">test_show_prints_resolved_spec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tmp_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capsys</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#unit.test_cli_board.test_show_prints_resolved_spec" title="Link to this definition">¶</a></dt>
+<dd><p>Check that <code class="docutils literal notranslate"><span class="pre">show</span></code> prints every resolved storage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tmp_path</strong> (<em>pathlib.Path</em>) -- Temporary directory for test files.</p></li>
+<li><p><strong>capsys</strong> (<em>pytest.CaptureFixture</em><em>[</em><em>str</em><em>]</em>) -- Captures standard output.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">pytest</span> <span class="pre">tests/unit/test_cli_board.py::test_show_prints_resolved_spec</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="unit.test_cli_board.test_show_applies_variants">
+<span class="sig-prename descclassname"><span class="pre">unit.test_cli_board.</span></span><span class="sig-name descname"><span class="pre">test_show_applies_variants</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tmp_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capsys</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#unit.test_cli_board.test_show_applies_variants" title="Link to this definition">¶</a></dt>
+<dd><p>Check that <code class="docutils literal notranslate"><span class="pre">show</span> <span class="pre">--hlos</span></code> applies the variant overlay.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tmp_path</strong> (<em>pathlib.Path</em>) -- Temporary directory for test files.</p></li>
+<li><p><strong>capsys</strong> (<em>pytest.CaptureFixture</em><em>[</em><em>str</em><em>]</em>) -- Captures standard output.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">pytest</span> <span class="pre">tests/unit/test_cli_board.py::test_show_applies_variants</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="unit.test_cli_board.test_show_requires_board">
+<span class="sig-prename descclassname"><span class="pre">unit.test_cli_board.</span></span><span class="sig-name descname"><span class="pre">test_show_requires_board</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#unit.test_cli_board.test_show_requires_board" title="Link to this definition">¶</a></dt>
+<dd><p>Check that <code class="docutils literal notranslate"><span class="pre">show</span></code> without <code class="docutils literal notranslate"><span class="pre">--board</span></code> exits.</p>
+<p>Example: <code class="docutils literal notranslate"><span class="pre">pytest</span> <span class="pre">tests/unit/test_cli_board.py::test_show_requires_board</span></code></p>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../README.html">qcom-ptool</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../user/README.html">User documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../README.html">Contributor documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../CONTRIBUTING.html">Contributing to qcom-ptool</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../DEVELOPMENT.html">Set up your development environment</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../README.html#function-reference">Function reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href=".github-test_reference_coverage.py.html">.github/test_reference_coverage.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="degpt-src-lib.rs.html">degpt/src/lib.rs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="degpt-src-main.rs.html">degpt/src/main.rs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="degpt-src-mygpt-header.rs.html">degpt/src/mygpt/header.rs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="degpt-src-mygpt-partition.rs.html">degpt/src/mygpt/partition.rs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="degpt-src-mygpt.rs.html">degpt/src/mygpt.rs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-board.py.html">qcom_ptool/board.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-cli.py.html">qcom_ptool/cli.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-gen_contents.py.html">qcom_ptool/gen_contents.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-gen_partition.py.html">qcom_ptool/gen_partition.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-gen_udev_rules.py.html">qcom_ptool/gen_udev_rules.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-loaders-__init__.py.html">qcom_ptool/loaders/__init__.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-loaders-conf.py.html">qcom_ptool/loaders/conf.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-loaders-yaml.py.html">qcom_ptool/loaders/yaml.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-msp.py.html">qcom_ptool/msp.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-ptool.py.html">qcom_ptool/ptool.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-show.py.html">qcom_ptool/show.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-spec.py.html">qcom_ptool/spec.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="qcom_ptool-utils.py.html">qcom_ptool/utils.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests-unit-test_board.py.html">tests/unit/test_board.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests-unit-test_cli.py.html">tests/unit/test_cli.py</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">tests/unit/test_cli_board.py</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#unit.test_cli_board._board"><code class="docutils literal notranslate"><span class="pre">_board()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#unit.test_cli_board.test_board_mode_emits_one_xml_per_storage"><code class="docutils literal notranslate"><span class="pre">test_board_mode_emits_one_xml_per_storage()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#unit.test_cli_board.test_board_mode_output_count_mismatch_returns_1"><code class="docutils literal notranslate"><span class="pre">test_board_mode_output_count_mismatch_returns_1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#unit.test_cli_board.test_requires_exactly_one_source"><code class="docutils literal notranslate"><span class="pre">test_requires_exactly_one_source()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#unit.test_cli_board.test_legacy_single_storage_still_works"><code class="docutils literal notranslate"><span class="pre">test_legacy_single_storage_still_works()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#unit.test_cli_board.test_show_prints_resolved_spec"><code class="docutils literal notranslate"><span class="pre">test_show_prints_resolved_spec()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#unit.test_cli_board.test_show_applies_variants"><code class="docutils literal notranslate"><span class="pre">test_show_applies_variants()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#unit.test_cli_board.test_show_requires_board"><code class="docutils literal notranslate"><span class="pre">test_show_requires_board()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tests-unit-test_gen_partition.py.html">tests/unit/test_gen_partition.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests-unit-test_gen_udev_rules.py.html">tests/unit/test_gen_udev_rules.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests-unit-test_loaders_conf.py.html">tests/unit/test_loaders_conf.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests-unit-test_loaders_yaml.py.html">tests/unit/test_loaders_yaml.py</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests-unit-test_utils.py.html">tests/unit/test_utils.py</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../README.html#files">Files</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../README.html">Documentation overview</a><ul>
+  <li><a href="../README.html">Contributor documentation</a><ul>
+      <li>Previous: <a href="tests-unit-test_cli.py.html" title="previous chapter">tests/unit/test_cli.py</a></li>
+      <li>Next: <a href="tests-unit-test_gen_partition.py.html" title="next chapter">tests/unit/test_gen_partition.py</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      
+      
+      
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
