@@ -35,6 +35,9 @@ pub struct Partition {
 }
 
 impl fmt::Display for Partition {
+    /// Format the partition name, GUIDs, sector span and flags, one per line.
+    ///
+    /// Example: `println!("{part:#}")` prints the `Partition:` to `Flags:` lines.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
@@ -50,6 +53,9 @@ impl fmt::Display for Partition {
     }
 }
 
+/// Convert little-endian UTF-16 bytes to code units, dropping NUL units.
+///
+/// Example: `get_utf16le(&[0x65, 0x00, 0x00, 0x00])` returns `vec![0x65]`.
 fn get_utf16le(buf: &[u8]) -> Vec<u16> {
     let mut r = vec![];
     for c in buf.chunks(2) {
@@ -64,6 +70,13 @@ fn get_utf16le(buf: &[u8]) -> Vec<u16> {
 impl TryFrom<&[u8]> for Partition {
     type Error = Box<dyn Error>;
 
+    /// Parse a 128-byte GPT partition entry.
+    ///
+    /// Returns an error when a GUID cannot be read or the name is not valid UTF-16.
+    /// Panics when `buf` is shorter than 128 bytes.
+    ///
+    /// Example: `Partition::try_from(&bytes[0x2000..0x2080])?` reads the first entry
+    /// of an image with 4096-byte sectors.
     fn try_from(buf: &[u8]) -> Result<Self, Self::Error> {
         Ok(Partition {
             part_type_guid: Type {

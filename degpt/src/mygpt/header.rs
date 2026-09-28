@@ -42,6 +42,9 @@ pub struct Header {
 }
 
 impl fmt::Display for Header {
+    /// Format the disk GUID and both CRC values, one per line.
+    ///
+    /// Example: `println!("{hdr:#}")` prints the `Disk:`, `CRC32:` and `Table CRC:` lines.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
@@ -54,6 +57,13 @@ impl fmt::Display for Header {
 impl TryFrom<&[u8]> for Header {
     type Error = Box<dyn Error>;
 
+    /// Parse the first 92 bytes of `buf` as a GPT header.
+    ///
+    /// Returns an error when the signature is not UTF-8 or the disk GUID cannot be
+    /// read. Panics when `buf` is shorter than 92 bytes.
+    ///
+    /// Example: `Header::try_from(&bytes[0x1000..0x2000])?` reads the primary header of
+    /// an image with 4096-byte sectors.
     fn try_from(buf: &[u8]) -> Result<Self, Self::Error> {
         Ok(Header {
             signature: String::from_utf8(buf[0..8].into())?,

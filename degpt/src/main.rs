@@ -9,6 +9,14 @@ use std::io::Write;
 
 use degpt::mygpt::*;
 
+/// Write a partition XML that describes the partitions in GPT images.
+///
+/// The first argument names the XML file to create. Each further argument is a
+/// `gpt_both*.bin` image with 4096-byte sectors; its header and non-empty
+/// partitions are printed and added as one `physical_partition`. Returns an error
+/// when no XML file is named or an image cannot be read or parsed.
+///
+/// Example: `degpt partition.xml gpt_both0.bin` writes `partition.xml`.
 fn main() -> Result<(), Box<dyn Error>> {
     let mut args = env::args().skip(1);
 
