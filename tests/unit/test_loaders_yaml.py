@@ -28,6 +28,16 @@ GLYMUR_NVME_YAML = os.path.join(DATA_DIR, "glymur-crd-nvme.yaml")
 
 
 def _write(tmp_path, name: str, text: str) -> str:
+    """Write a text file in a temporary directory.
+
+    :param tmp_path: Temporary directory for test files.
+    :type tmp_path: pathlib.Path
+    :param name: File name.
+    :param text: File contents.
+    :returns: Path of the written file.
+
+    Example: ``_write(tmp_path, "p.yaml", _VALID_DISK)``
+    """
     path = tmp_path / name
     path.write_text(text)
     return str(path)
@@ -39,12 +49,21 @@ def _write(tmp_path, name: str, text: str) -> str:
 
 
 def test_yaml_matches_conf_for_glymur_nvme():
-    """The committed YAML fixture and the real board .conf load identically."""
+    """The committed YAML fixture and the real board .conf load identically.
+
+    Example: ``pytest tests/unit/test_loaders_yaml.py::test_yaml_matches_conf_for_glymur_nvme``
+    """
     assert load(GLYMUR_NVME_YAML) == load(GLYMUR_NVME_CONF)
 
 
 def test_yaml_matches_conf_multi_lun_and_attributes(tmp_path):
-    """LUN grouping and attribute-bit decoding match the .conf loader."""
+    """LUN grouping and attribute-bit decoding match the .conf loader.
+
+    :param tmp_path: Temporary directory for test files.
+    :type tmp_path: pathlib.Path
+
+    Example: ``pytest tests/unit/test_loaders_yaml.py::test_yaml_matches_conf_multi_lun_and_attributes``
+    """
     conf = _write(
         tmp_path,
         "s.conf",
@@ -87,7 +106,13 @@ def test_yaml_matches_conf_multi_lun_and_attributes(tmp_path):
 
 
 def test_yaml_and_conf_emit_byte_identical_xml(tmp_path):
-    """End-to-end: the emitter output is identical for both source formats."""
+    """End-to-end: the emitter output is identical for both source formats.
+
+    :param tmp_path: Temporary directory for test files.
+    :type tmp_path: pathlib.Path
+
+    Example: ``pytest tests/unit/test_loaders_yaml.py::test_yaml_and_conf_emit_byte_identical_xml``
+    """
     conf_xml = tmp_path / "from_conf.xml"
     yaml_xml = tmp_path / "from_yaml.xml"
     conf_spec = load(GLYMUR_NVME_CONF)
@@ -103,7 +128,13 @@ def test_yaml_and_conf_emit_byte_identical_xml(tmp_path):
 
 
 def test_dispatcher_routes_yaml_and_yml(tmp_path):
-    """The dispatcher sends .yaml and .yml to the YAML loader."""
+    """The dispatcher sends .yaml and .yml to the YAML loader.
+
+    :param tmp_path: Temporary directory for test files.
+    :type tmp_path: pathlib.Path
+
+    Example: ``pytest tests/unit/test_loaders_yaml.py::test_dispatcher_routes_yaml_and_yml``
+    """
     body = (
         "disk:\n"
         "  type: nvme\n"
@@ -120,7 +151,13 @@ def test_dispatcher_routes_yaml_and_yml(tmp_path):
 
 
 def test_sparse_boolean_normalised_to_lowercase(tmp_path):
-    """A YAML boolean must serialise as "true", not Python's "True"."""
+    """A YAML boolean must serialise as "true", not Python's "True".
+
+    :param tmp_path: Temporary directory for test files.
+    :type tmp_path: pathlib.Path
+
+    Example: ``pytest tests/unit/test_loaders_yaml.py::test_sparse_boolean_normalised_to_lowercase``
+    """
     spec = load(
         _write(
             tmp_path,
@@ -137,7 +174,13 @@ def test_sparse_boolean_normalised_to_lowercase(tmp_path):
 
 
 def test_image_map_overrides_filename(tmp_path):
-    """The -m image map overrides filename, matching the .conf loader."""
+    """The -m image map overrides filename, matching the .conf loader.
+
+    :param tmp_path: Temporary directory for test files.
+    :type tmp_path: pathlib.Path
+
+    Example: ``pytest tests/unit/test_loaders_yaml.py::test_image_map_overrides_filename``
+    """
     spec = load(
         _write(
             tmp_path,
@@ -162,6 +205,14 @@ _VALID_DISK = "disk:\n  type: nvme\n  size: 68719476736\n"
 
 
 def _partition(**overrides) -> str:
+    """Return a YAML document with one partition and field overrides.
+
+    :param overrides: Partition fields to add or replace, as YAML text.
+    :type overrides: str
+    :returns: The YAML document.
+
+    Example: ``_partition(priority="4")``
+    """
     fields = {
         "name": "efi",
         "size": '"524288KB"',
@@ -193,11 +244,27 @@ def _partition(**overrides) -> str:
     ],
 )
 def test_schema_rejects_invalid(tmp_path, text):
+    """Check that schema violations raise ``YamlParseError``.
+
+    :param tmp_path: Temporary directory for test files.
+    :type tmp_path: pathlib.Path
+    :param text: Invalid YAML document.
+    :type text: str
+
+    Example: ``pytest tests/unit/test_loaders_yaml.py::test_schema_rejects_invalid``
+    """
     with pytest.raises(yaml_loader.YamlParseError):
         load(_write(tmp_path, "bad.yaml", text))
 
 
 def test_top_level_must_be_mapping(tmp_path):
+    """Check that a top-level list is rejected.
+
+    :param tmp_path: Temporary directory for test files.
+    :type tmp_path: pathlib.Path
+
+    Example: ``pytest tests/unit/test_loaders_yaml.py::test_top_level_must_be_mapping``
+    """
     with pytest.raises(yaml_loader.YamlParseError):
         load(_write(tmp_path, "list.yaml", "- 1\n- 2\n"))
 
@@ -211,6 +278,15 @@ _UGUID = "11111111-2222-3333-4444-555555555555"
 
 
 def _conf_with(tmp_path, extra: str) -> str:
+    """Write a one-partition ``.conf`` file with extra options.
+
+    :param tmp_path: Temporary directory for test files.
+    :type tmp_path: pathlib.Path
+    :param extra: Options appended to the ``--partition`` line.
+    :returns: Path of the written file.
+
+    Example: ``_conf_with(tmp_path, "--bootable=yes")``
+    """
     return _write(
         tmp_path,
         "p.conf",
@@ -221,6 +297,15 @@ def _conf_with(tmp_path, extra: str) -> str:
 
 
 def _yaml_with(tmp_path, extra: str) -> str:
+    """Write a one-partition YAML file with an extra field.
+
+    :param tmp_path: Temporary directory for test files.
+    :type tmp_path: pathlib.Path
+    :param extra: Field line appended to the partition.
+    :returns: Path of the written file.
+
+    Example: ``_yaml_with(tmp_path, "bootable: true")``
+    """
     return _write(
         tmp_path,
         "p.yaml",
@@ -248,7 +333,21 @@ def _yaml_with(tmp_path, extra: str) -> str:
     ],
 )
 def test_named_field_matches_conf(tmp_path, yaml_field, conf_opt, entry_key, expected):
-    """Each named field loads to the exact entry the .conf option produces."""
+    """Each named field loads to the exact entry the .conf option produces.
+
+    :param tmp_path: Temporary directory for test files.
+    :type tmp_path: pathlib.Path
+    :param yaml_field: YAML field line.
+    :type yaml_field: str
+    :param conf_opt: Matching ``.conf`` option.
+    :type conf_opt: str
+    :param entry_key: Partition entry key to compare.
+    :type entry_key: str
+    :param expected: Expected entry value.
+    :type expected: str
+
+    Example: ``pytest tests/unit/test_loaders_yaml.py::test_named_field_matches_conf``
+    """
     conf_spec = load(_conf_with(tmp_path, conf_opt))
     yaml_spec = load(_yaml_with(tmp_path, yaml_field))
     assert yaml_spec == conf_spec
@@ -256,7 +355,13 @@ def test_named_field_matches_conf(tmp_path, yaml_field, conf_opt, entry_key, exp
 
 
 def test_named_fields_override_attributes(tmp_path):
-    """A named field wins over the raw attributes hex, as in the .conf loader."""
+    """A named field wins over the raw attributes hex, as in the .conf loader.
+
+    :param tmp_path: Temporary directory for test files.
+    :type tmp_path: pathlib.Path
+
+    Example: ``pytest tests/unit/test_loaders_yaml.py::test_named_fields_override_attributes``
+    """
     # attributes sets bootable (bit 2) and readonly (bit 60); named fields
     # invert both.
     conf_spec = load(
@@ -285,7 +390,13 @@ def test_named_fields_override_attributes(tmp_path):
 
 
 def test_named_fields_emit_byte_identical_xml(tmp_path):
-    """All named fields together still emit byte-identical XML per format."""
+    """All named fields together still emit byte-identical XML per format.
+
+    :param tmp_path: Temporary directory for test files.
+    :type tmp_path: pathlib.Path
+
+    Example: ``pytest tests/unit/test_loaders_yaml.py::test_named_fields_emit_byte_identical_xml``
+    """
     extra_conf = (
         "--bootable=yes --readonly=no --priority=2 --tries-remaining=6 "
         "--active=yes --successful=no --unbootable=no "
@@ -336,5 +447,14 @@ def test_named_fields_emit_byte_identical_xml(tmp_path):
     ],
 )
 def test_schema_rejects_invalid_named_fields(tmp_path, text):
+    """Check that out-of-range or mistyped named fields are rejected.
+
+    :param tmp_path: Temporary directory for test files.
+    :type tmp_path: pathlib.Path
+    :param text: Invalid YAML document.
+    :type text: str
+
+    Example: ``pytest tests/unit/test_loaders_yaml.py::test_schema_rejects_invalid_named_fields``
+    """
     with pytest.raises(yaml_loader.YamlParseError):
         load(_write(tmp_path, "bad.yaml", text))

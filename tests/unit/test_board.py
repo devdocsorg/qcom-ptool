@@ -31,7 +31,15 @@ GUID_D = "CD6CDFAB-B3F7-46C6-BFFE-1A1D2B8B7BA0"
 
 
 def _tree(tmp_path, files: dict[str, str]) -> str:
-    """Write a mini platforms tree and return its root path."""
+    """Write a mini platforms tree and return its root path.
+
+    :param tmp_path: Temporary directory for test files.
+    :type tmp_path: pathlib.Path
+    :param files: Paths below ``platforms/`` mapped to YAML text.
+    :returns: Path of the created ``platforms`` directory.
+
+    Example: ``_tree(tmp_path, {"boards/b.yaml": _BASE})`` writes ``platforms/boards/b.yaml``.
+    """
     root = tmp_path / "platforms"
     for rel, text in files.items():
         path = root / rel
@@ -41,10 +49,26 @@ def _tree(tmp_path, files: dict[str, str]) -> str:
 
 
 def _names(storage: dict) -> list[str]:
+    """Return the partition names of a storage in order.
+
+    :param storage: Resolved storage mapping.
+    :returns: Partition names.
+
+    Example: ``_names({"partitions": [{"name": "efi"}]})`` returns ``["efi"]``.
+    """
     return [p["name"] for p in storage["partitions"]]
 
 
 def _by_id(board, sid: str) -> dict:
+    """Return the storage with the given ID from a resolved board.
+
+    :param board: Resolved board.
+    :type board: qcom_ptool.board.ResolvedBoard
+    :param sid: Storage ID.
+    :returns: The matching storage.
+
+    Example: ``_by_id(board, "ufs")``
+    """
     return next(s for s in board["storage"] if s["id"] == sid)
 
 
@@ -74,6 +98,13 @@ _BASE = """
 
 
 def test_extends_inherits_and_overrides_by_name(tmp_path):
+    """Check that a derived board inherits its base and overrides partitions by name.
+
+    :param tmp_path: Temporary directory for test files.
+    :type tmp_path: pathlib.Path
+
+    Example: ``pytest tests/unit/test_board.py::test_extends_inherits_and_overrides_by_name``
+    """
     root = _tree(
         tmp_path,
         {
@@ -101,6 +132,13 @@ def test_extends_inherits_and_overrides_by_name(tmp_path):
 
 
 def test_extends_appends_new_storage_and_partition(tmp_path):
+    """Check that a derived board appends storages and partitions its base lacks.
+
+    :param tmp_path: Temporary directory for test files.
+    :type tmp_path: pathlib.Path
+
+    Example: ``pytest tests/unit/test_board.py::test_extends_appends_new_storage_and_partition``
+    """
     root = _tree(
         tmp_path,
         {
@@ -129,6 +167,13 @@ def test_extends_appends_new_storage_and_partition(tmp_path):
 
 
 def test_extends_cycle_is_rejected(tmp_path):
+    """Check that an ``extends`` cycle is rejected.
+
+    :param tmp_path: Temporary directory for test files.
+    :type tmp_path: pathlib.Path
+
+    Example: ``pytest tests/unit/test_board.py::test_extends_cycle_is_rejected``
+    """
     root = _tree(
         tmp_path,
         {
@@ -146,6 +191,13 @@ def test_extends_cycle_is_rejected(tmp_path):
 
 
 def test_includes_concatenate_then_inline_last(tmp_path):
+    """Check that included fragments come first and inline partitions last.
+
+    :param tmp_path: Temporary directory for test files.
+    :type tmp_path: pathlib.Path
+
+    Example: ``pytest tests/unit/test_board.py::test_includes_concatenate_then_inline_last``
+    """
     root = _tree(
         tmp_path,
         {
@@ -180,6 +232,13 @@ def test_includes_concatenate_then_inline_last(tmp_path):
 
 
 def test_includes_are_transitive(tmp_path):
+    """Check that fragments can include further fragments.
+
+    :param tmp_path: Temporary directory for test files.
+    :type tmp_path: pathlib.Path
+
+    Example: ``pytest tests/unit/test_board.py::test_includes_are_transitive``
+    """
     root = _tree(
         tmp_path,
         {
@@ -212,6 +271,13 @@ def test_includes_are_transitive(tmp_path):
 
 
 def test_includes_cycle_is_rejected(tmp_path):
+    """Check that an ``includes`` cycle is rejected.
+
+    :param tmp_path: Temporary directory for test files.
+    :type tmp_path: pathlib.Path
+
+    Example: ``pytest tests/unit/test_board.py::test_includes_cycle_is_rejected``
+    """
     root = _tree(
         tmp_path,
         {
@@ -236,6 +302,13 @@ def test_includes_cycle_is_rejected(tmp_path):
 
 
 def test_variants_apply_last_over_includes(tmp_path):
+    """Check that variant overlays are applied after includes.
+
+    :param tmp_path: Temporary directory for test files.
+    :type tmp_path: pathlib.Path
+
+    Example: ``pytest tests/unit/test_board.py::test_variants_apply_last_over_includes``
+    """
     root = _tree(
         tmp_path,
         {
@@ -310,6 +383,13 @@ def test_variants_apply_last_over_includes(tmp_path):
 
 
 def test_resolved_storage_missing_type_is_rejected(tmp_path):
+    """Check that a resolved storage without a ``type`` is rejected.
+
+    :param tmp_path: Temporary directory for test files.
+    :type tmp_path: pathlib.Path
+
+    Example: ``pytest tests/unit/test_board.py::test_resolved_storage_missing_type_is_rejected``
+    """
     root = _tree(
         tmp_path,
         {
@@ -330,6 +410,13 @@ def test_resolved_storage_missing_type_is_rejected(tmp_path):
 
 def test_partition_missing_type_guid_after_resolution_is_rejected(tmp_path):
     # rootfs never gets a type-guid from base or any overlay -> invalid.
+    """Check that a resolved partition without a ``type-guid`` is rejected.
+
+    :param tmp_path: Temporary directory for test files.
+    :type tmp_path: pathlib.Path
+
+    Example: ``pytest tests/unit/test_board.py::test_partition_missing_type_guid_after_resolution_is_rejected``
+    """
     root = _tree(
         tmp_path,
         {
@@ -355,7 +442,13 @@ def test_partition_missing_type_guid_after_resolution_is_rejected(tmp_path):
 
 def test_board_reduces_to_byte_identical_xml(tmp_path):
     """A resolved single-storage board emits the same XML as the equivalent
-    hand-written single-storage YAML loaded via the Phase 2 loader."""
+    hand-written single-storage YAML loaded via the Phase 2 loader.
+
+    :param tmp_path: Temporary directory for test files.
+    :type tmp_path: pathlib.Path
+
+    Example: ``pytest tests/unit/test_board.py::test_board_reduces_to_byte_identical_xml``
+    """
     root = _tree(
         tmp_path,
         {
@@ -416,6 +509,13 @@ def test_board_reduces_to_byte_identical_xml(tmp_path):
 
 
 def test_image_map_flows_through_reduction(tmp_path):
+    """Check that an image map overrides filenames when a board is reduced.
+
+    :param tmp_path: Temporary directory for test files.
+    :type tmp_path: pathlib.Path
+
+    Example: ``pytest tests/unit/test_board.py::test_image_map_flows_through_reduction``
+    """
     root = _tree(
         tmp_path,
         {

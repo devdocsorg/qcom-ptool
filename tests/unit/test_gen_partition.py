@@ -21,6 +21,19 @@ BASIC_CONF = """\
 
 
 def run_gen_partition(tmp_path, conf_text, extra_args=()):
+    """Write a ``.conf`` file and run ``gen_partition`` on it in a subprocess.
+
+    :param tmp_path: Temporary directory for test files.
+    :type tmp_path: pathlib.Path
+    :param conf_text: Contents of the ``.conf`` file.
+    :type conf_text: str
+    :param extra_args: Additional command-line arguments.
+    :type extra_args: collections.abc.Sequence[str]
+    :returns: The completed process and the output XML path.
+    :rtype: tuple[subprocess.CompletedProcess[str], pathlib.Path]
+
+    Example: ``run_gen_partition(tmp_path, BASIC_CONF)``
+    """
     conf = tmp_path / "partitions.conf"
     out = tmp_path / "partitions.xml"
     conf.write_text(conf_text, encoding="utf-8")
@@ -44,6 +57,15 @@ def run_gen_partition(tmp_path, conf_text, extra_args=()):
 
 @pytest.fixture(scope="module")
 def basic_output(tmp_path_factory):
+    """Provide the XML generated from ``BASIC_CONF`` once per module.
+
+    :param tmp_path_factory: Creates the module's temporary directory.
+    :type tmp_path_factory: pytest.TempPathFactory
+    :returns: Root element of the generated XML.
+    :rtype: xml.etree.ElementTree.Element
+
+    Example: ``def test_x(basic_output): assert basic_output.tag == "configuration"``
+    """
     tmp_path = tmp_path_factory.mktemp("gen_partition")
     result, out = run_gen_partition(tmp_path, BASIC_CONF)
     assert result.returncode == 0, result.stdout + result.stderr
@@ -51,6 +73,15 @@ def basic_output(tmp_path_factory):
 
 
 def get_partitions(root):
+    """Map partition labels to their elements in a generated XML.
+
+    :param root: Root element of a generated partition XML.
+    :type root: xml.etree.ElementTree.Element
+    :returns: Partition elements keyed by label.
+    :rtype: dict[str, xml.etree.ElementTree.Element]
+
+    Example: ``get_partitions(basic_output)["cdt"].get("size_in_kb")`` returns ``"2"``.
+    """
     return {
         p.get("label"): p
         for phys in root.findall("physical_partition")
@@ -59,12 +90,26 @@ def get_partitions(root):
 
 
 def test_generates_configuration_root(basic_output):
+    """Check that the XML root element is ``configuration``.
+
+    :param basic_output: Root element of the XML generated from ``BASIC_CONF``.
+    :type basic_output: xml.etree.ElementTree.Element
+
+    Example: ``pytest tests/unit/test_gen_partition.py::test_generates_configuration_root``
+    """
     assert basic_output.tag == "configuration"
     assert basic_output.find("parser_instructions") is not None
     assert len(basic_output.findall("physical_partition")) == 1
 
 
 def test_sector_size_in_parser_instructions(basic_output):
+    """Check that the sector size appears in ``parser_instructions``.
+
+    :param basic_output: Root element of the XML generated from ``BASIC_CONF``.
+    :type basic_output: xml.etree.ElementTree.Element
+
+    Example: ``pytest tests/unit/test_gen_partition.py::test_sector_size_in_parser_instructions``
+    """
     text = basic_output.find("parser_instructions").text
     assert "SECTOR_SIZE_IN_BYTES=512" in text
 
@@ -75,10 +120,28 @@ def test_sector_size_in_parser_instructions(basic_output):
 )
 def test_size_suffix_parsing(basic_output, label, expected_kb):
     # KB / MB / GB suffixes must all normalize to size_in_kb.
+    """Check that KB, MB and GB sizes become ``size_in_kb``.
+
+    :param basic_output: Root element of the XML generated from ``BASIC_CONF``.
+    :type basic_output: xml.etree.ElementTree.Element
+    :param label: Partition label.
+    :type label: str
+    :param expected_kb: Expected ``size_in_kb`` value.
+    :type expected_kb: str
+
+    Example: ``pytest tests/unit/test_gen_partition.py::test_size_suffix_parsing``
+    """
     assert get_partitions(basic_output)[label].get("size_in_kb") == expected_kb
 
 
 def test_plain_size_is_interpreted_as_bytes(tmp_path):
+    """Check that a size without a suffix is read as bytes.
+
+    :param tmp_path: Temporary directory for test files.
+    :type tmp_path: pathlib.Path
+
+    Example: ``pytest tests/unit/test_gen_partition.py::test_plain_size_is_interpreted_as_bytes``
+    """
     conf = """\
 --disk --type=emmc --size=16777216
 --partition --name=data --size=4096
@@ -90,22 +153,50 @@ def test_plain_size_is_interpreted_as_bytes(tmp_path):
 
 
 def test_attribute_bit2_sets_bootable(basic_output):
+    """Check that attribute bit 2 sets ``bootable``.
+
+    :param basic_output: Root element of the XML generated from ``BASIC_CONF``.
+    :type basic_output: xml.etree.ElementTree.Element
+
+    Example: ``pytest tests/unit/test_gen_partition.py::test_attribute_bit2_sets_bootable``
+    """
     parts = get_partitions(basic_output)
     assert parts["boot"].get("bootable") == "true"
     assert parts["boot"].get("readonly") == "false"
 
 
 def test_attribute_bit60_sets_readonly(basic_output):
+    """Check that attribute bit 60 sets ``readonly``.
+
+    :param basic_output: Root element of the XML generated from ``BASIC_CONF``.
+    :type basic_output: xml.etree.ElementTree.Element
+
+    Example: ``pytest tests/unit/test_gen_partition.py::test_attribute_bit60_sets_readonly``
+    """
     parts = get_partitions(basic_output)
     assert parts["rootfs"].get("bootable") == "false"
     assert parts["rootfs"].get("readonly") == "true"
 
 
 def test_filename_passthrough(basic_output):
+    """Check that ``--filename`` is copied to the XML.
+
+    :param basic_output: Root element of the XML generated from ``BASIC_CONF``.
+    :type basic_output: xml.etree.ElementTree.Element
+
+    Example: ``pytest tests/unit/test_gen_partition.py::test_filename_passthrough``
+    """
     assert get_partitions(basic_output)["cdt"].get("filename") == "cdt.bin"
 
 
 def test_partition_image_map_overrides_filename(tmp_path):
+    """Check that ``-m`` overrides a partition filename.
+
+    :param tmp_path: Temporary directory for test files.
+    :type tmp_path: pathlib.Path
+
+    Example: ``pytest tests/unit/test_gen_partition.py::test_partition_image_map_overrides_filename``
+    """
     result, out = run_gen_partition(
         tmp_path, BASIC_CONF, extra_args=["-m", "cdt=other.bin,boot=boot.img"]
     )
@@ -117,6 +208,13 @@ def test_partition_image_map_overrides_filename(tmp_path):
 
 
 def test_multiple_luns_sorted(tmp_path):
+    """Check that physical partitions are written in LUN order.
+
+    :param tmp_path: Temporary directory for test files.
+    :type tmp_path: pathlib.Path
+
+    Example: ``pytest tests/unit/test_gen_partition.py::test_multiple_luns_sorted``
+    """
     conf = """\
 --disk --type=ufs --size=16777216
 --partition --lun=2 --name=late --size=1KB
@@ -133,6 +231,13 @@ def test_multiple_luns_sorted(tmp_path):
 
 
 def test_duplicate_disk_entry_fails(tmp_path):
+    """Check that two ``--disk`` lines make the command fail.
+
+    :param tmp_path: Temporary directory for test files.
+    :type tmp_path: pathlib.Path
+
+    Example: ``pytest tests/unit/test_gen_partition.py::test_duplicate_disk_entry_fails``
+    """
     conf = "--disk --type=emmc --size=1\n--disk --type=emmc --size=2\n--partition --name=a --size=1KB\n"
     result, _ = run_gen_partition(tmp_path, conf)
     assert result.returncode == 1
@@ -140,6 +245,10 @@ def test_duplicate_disk_entry_fails(tmp_path):
 
 
 def test_missing_arguments_shows_usage():
+    """Check that running without arguments prints the usage.
+
+    Example: ``pytest tests/unit/test_gen_partition.py::test_missing_arguments_shows_usage``
+    """
     result = subprocess.run(
         [sys.executable, "-m", "qcom_ptool.gen_partition"],
         capture_output=True,

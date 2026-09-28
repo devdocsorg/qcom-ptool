@@ -17,6 +17,13 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
 def subprocess_env():
+    """Return the environment with the repository root on ``PYTHONPATH``.
+
+    :returns: A copy of ``os.environ`` for subprocesses.
+    :rtype: dict[str, str]
+
+    Example: ``subprocess.run(cmd, env=subprocess_env())``
+    """
     env = os.environ.copy()
     existing = env.get("PYTHONPATH")
     env["PYTHONPATH"] = (
@@ -28,6 +35,15 @@ def subprocess_env():
 
 
 def run_cli(*args):
+    """Run ``python -m qcom_ptool.cli`` with arguments and capture its output.
+
+    :param args: Command-line arguments.
+    :type args: str
+    :returns: The completed process with text output.
+    :rtype: subprocess.CompletedProcess[str]
+
+    Example: ``run_cli("--version").returncode`` returns ``0``.
+    """
     return subprocess.run(
         [sys.executable, "-m", "qcom_ptool.cli", *args],
         capture_output=True,
@@ -37,12 +53,20 @@ def run_cli(*args):
 
 
 def test_version_flag():
+    """Check that ``--version`` prints the package version.
+
+    Example: ``pytest tests/unit/test_cli.py::test_version_flag``
+    """
     result = run_cli("--version")
     assert result.returncode == 0
     assert __version__ in result.stdout
 
 
 def test_help_lists_all_subcommands():
+    """Check that ``--help`` lists every subcommand.
+
+    Example: ``pytest tests/unit/test_cli.py::test_help_lists_all_subcommands``
+    """
     result = run_cli("--help")
     assert result.returncode == 0
     for name in SUBCOMMANDS:
@@ -50,6 +74,10 @@ def test_help_lists_all_subcommands():
 
 
 def test_unknown_subcommand_rejected():
+    """Check that an unknown subcommand exits with status 2.
+
+    Example: ``pytest tests/unit/test_cli.py::test_unknown_subcommand_rejected``
+    """
     result = run_cli("frobnicate")
     assert result.returncode == 2
     assert "frobnicate" in result.stderr
@@ -58,6 +86,15 @@ def test_unknown_subcommand_rejected():
 @pytest.mark.parametrize("name", sorted(SUBCOMMANDS))
 def test_subcommand_dispatch(name, tmp_path):
     # Scripts exit non-zero without args; tmp_path because ptool writes files to CWD.
+    """Check that each subcommand runs and fails without arguments.
+
+    :param name: Subcommand name from ``SUBCOMMANDS``.
+    :type name: str
+    :param tmp_path: Temporary directory for test files.
+    :type tmp_path: pathlib.Path
+
+    Example: ``pytest tests/unit/test_cli.py::test_subcommand_dispatch``
+    """
     result = subprocess.run(
         [sys.executable, "-m", "qcom_ptool.cli", name],
         capture_output=True,

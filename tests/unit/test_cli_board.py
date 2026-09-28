@@ -43,6 +43,14 @@ _BOARD = """
 
 
 def _board(tmp_path) -> str:
+    """Write the demo board file below a temporary ``platforms/boards`` directory.
+
+    :param tmp_path: Temporary directory for test files.
+    :type tmp_path: pathlib.Path
+    :returns: Path of the board file.
+
+    Example: ``_board(tmp_path)``
+    """
     root = tmp_path / "platforms"
     (root / "boards").mkdir(parents=True)
     path = root / "boards" / "demo.yaml"
@@ -51,6 +59,13 @@ def _board(tmp_path) -> str:
 
 
 def test_board_mode_emits_one_xml_per_storage(tmp_path):
+    """Check that ``--board`` writes one XML file per storage.
+
+    :param tmp_path: Temporary directory for test files.
+    :type tmp_path: pathlib.Path
+
+    Example: ``pytest tests/unit/test_cli_board.py::test_board_mode_emits_one_xml_per_storage``
+    """
     board = _board(tmp_path)
     nvme = tmp_path / "nvme.xml"
     spinor = tmp_path / "spinor.xml"
@@ -63,6 +78,13 @@ def test_board_mode_emits_one_xml_per_storage(tmp_path):
 
 
 def test_board_mode_output_count_mismatch_returns_1(tmp_path):
+    """Check that ``--board`` returns 1 when the output count differs from the storage count.
+
+    :param tmp_path: Temporary directory for test files.
+    :type tmp_path: pathlib.Path
+
+    Example: ``pytest tests/unit/test_cli_board.py::test_board_mode_output_count_mismatch_returns_1``
+    """
     board = _board(tmp_path)
     rc = gen_partition.main(
         ["gen_partition", "--board", board, "-o", str(tmp_path / "only.xml")]
@@ -71,6 +93,13 @@ def test_board_mode_output_count_mismatch_returns_1(tmp_path):
 
 
 def test_requires_exactly_one_source(tmp_path):
+    """Check that ``-i`` and ``--board`` together are rejected.
+
+    :param tmp_path: Temporary directory for test files.
+    :type tmp_path: pathlib.Path
+
+    Example: ``pytest tests/unit/test_cli_board.py::test_requires_exactly_one_source``
+    """
     board = _board(tmp_path)
     # both -i and --board -> usage() exits.
     with pytest.raises(SystemExit):
@@ -80,6 +109,13 @@ def test_requires_exactly_one_source(tmp_path):
 
 
 def test_legacy_single_storage_still_works(tmp_path):
+    """Check that ``-i`` with a single-storage YAML file still writes XML.
+
+    :param tmp_path: Temporary directory for test files.
+    :type tmp_path: pathlib.Path
+
+    Example: ``pytest tests/unit/test_cli_board.py::test_legacy_single_storage_still_works``
+    """
     src = tmp_path / "single.yaml"
     src.write_text(
         textwrap.dedent(
@@ -102,6 +138,15 @@ def test_legacy_single_storage_still_works(tmp_path):
 
 
 def test_show_prints_resolved_spec(tmp_path, capsys):
+    """Check that ``show`` prints every resolved storage.
+
+    :param tmp_path: Temporary directory for test files.
+    :type tmp_path: pathlib.Path
+    :param capsys: Captures standard output.
+    :type capsys: pytest.CaptureFixture[str]
+
+    Example: ``pytest tests/unit/test_cli_board.py::test_show_prints_resolved_spec``
+    """
     board = _board(tmp_path)
     rc = show.main(["show", "--board", board])
     assert rc == 0
@@ -112,6 +157,15 @@ def test_show_prints_resolved_spec(tmp_path, capsys):
 
 
 def test_show_applies_variants(tmp_path, capsys):
+    """Check that ``show --hlos`` applies the variant overlay.
+
+    :param tmp_path: Temporary directory for test files.
+    :type tmp_path: pathlib.Path
+    :param capsys: Captures standard output.
+    :type capsys: pytest.CaptureFixture[str]
+
+    Example: ``pytest tests/unit/test_cli_board.py::test_show_applies_variants``
+    """
     root = tmp_path / "platforms"
     (root / "boards").mkdir(parents=True)
     (root / "variants" / "hlos").mkdir(parents=True)
@@ -135,5 +189,9 @@ def test_show_applies_variants(tmp_path, capsys):
 
 
 def test_show_requires_board():
+    """Check that ``show`` without ``--board`` exits.
+
+    Example: ``pytest tests/unit/test_cli_board.py::test_show_requires_board``
+    """
     with pytest.raises(SystemExit):
         show.main(["show"])
