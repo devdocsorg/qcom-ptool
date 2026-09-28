@@ -8,6 +8,12 @@ from xml.etree import ElementTree as ET
 
 
 def usage():
+    """Print the ``gen_contents`` usage text and exit.
+
+    :raises SystemExit: Always, with status 1.
+
+    Example: ``qcom-ptool gen_contents -h`` calls this function.
+    """
     print(
         (
             "\n\tUsage: %s -t <template> -p <partitions_xml_path> -o <output> \n\tVersion 0.1\n"
@@ -18,6 +24,16 @@ def usage():
 
 
 def ParseXML(XMLFile):
+    """Parse an XML file and return its root element.
+
+    :param XMLFile: Path of the XML file to parse.
+    :type XMLFile: str
+    :returns: The root element, or ``None`` after printing an error when the file is
+        missing or malformed.
+    :rtype: xml.etree.ElementTree.Element | None
+
+    Example: ``ParseXML("partitions.xml").tag`` returns ``"configuration"``.
+    """
     try:
         tree = ET.parse(XMLFile)
         root = tree.getroot()
@@ -31,6 +47,22 @@ def ParseXML(XMLFile):
 
 
 def UpdateMetaData(TemplateRoot, PartitionRoot, BuildId):
+    """Fill a contents template with build IDs and the files a partition XML needs.
+
+    Every ``builds_flat/build`` receives a ``build_id``. In the ``common`` build, the
+    placeholder ``download_file``, ``partition_file`` and ``partition_patch_file``
+    entries are replaced with one entry per partition image, GPT file, rawprogram
+    file and patch file.
+
+    :param TemplateRoot: Root element of the parsed ``contents.xml.in`` template; changed in place.
+    :type TemplateRoot: xml.etree.ElementTree.Element
+    :param PartitionRoot: Root element of the parsed ``partitions.xml``.
+    :type PartitionRoot: xml.etree.ElementTree.Element
+    :param BuildId: Text written to each ``build_id`` element; may be empty.
+    :type BuildId: str
+
+    Example: ``UpdateMetaData(ParseXML("contents.xml.in"), ParseXML("partitions.xml"), "")``
+    """
     ChipIdList = TemplateRoot.findall("product_info/chipid")
     DefaultStorageType: str = ""
     for ChipId in ChipIdList:
@@ -50,7 +82,17 @@ def UpdateMetaData(TemplateRoot, PartitionRoot, BuildId):
     print(f"Partitions: {Partitions}")
 
     def _add_file_elements(parent_element, pathname, file_path_flavor=None):
-        """Helper function to add file_name and file_path sub-elements."""
+        """Helper function to add file_name and file_path sub-elements.
+
+        :param parent_element: Element that receives ``file_name`` and ``file_path``.
+        :type parent_element: xml.etree.ElementTree.Element
+        :param pathname: File path split into its name and directory.
+        :type pathname: str
+        :param file_path_flavor: Optional ``flavor`` attribute for ``file_path``.
+        :type file_path_flavor: str | None
+
+        Example: ``_add_file_elements(build, "gpt_main0.bin")`` adds ``gpt_main0.bin`` in ``.``.
+        """
         file_name_text = os.path.basename(pathname)
         file_path_text = os.path.dirname(pathname)
         if not file_path_text:  # no directory, use explicit . as current dir

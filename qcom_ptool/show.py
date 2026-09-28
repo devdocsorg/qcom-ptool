@@ -22,6 +22,12 @@ from qcom_ptool.board import resolve_board
 
 
 def usage() -> NoReturn:
+    """Print the ``show`` usage text and exit.
+
+    :raises SystemExit: Always, with status 1.
+
+    Example: ``qcom-ptool show`` without ``--board`` calls this function.
+    """
     print(
         "\n\tUsage: %s --board <board.yaml> [--hlos <name>] "
         "[--boot-fw <name>] [--root <dir>]\n" % sys.argv[0]
@@ -30,6 +36,15 @@ def usage() -> NoReturn:
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Resolve a board file and print the result as YAML.
+
+    :param argv: Command line including the program name; defaults to ``sys.argv``.
+    :returns: 0 on success, or 1 when the board cannot be resolved.
+    :raises SystemExit: With status 1 when ``--board`` is missing or an option is invalid.
+
+    Example: ``main(["show", "--board", "platforms/boards/glymur-crd.yaml"])`` prints
+    both storages of the Glymur-CRD board.
+    """
     if argv is None:
         argv = sys.argv
 

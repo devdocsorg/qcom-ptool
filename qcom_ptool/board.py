@@ -72,13 +72,29 @@ class ResolvedBoard(TypedDict):
 
 
 def _load_schema(name: str) -> dict[str, Any]:
+    """Return a packaged JSON Schema by file name.
+
+    :param name: Schema file in ``qcom_ptool/schema``, such as ``board.schema.json``.
+    :returns: The parsed schema.
+
+    Example: ``_load_schema("board.schema.json")["required"]`` returns ``["storage"]``.
+    """
     text = resources.files(_SCHEMA_PACKAGE).joinpath(name).read_text(encoding="utf-8")
     schema: dict[str, Any] = json.loads(text)
     return schema
 
 
 def _read_mapping(path: str, schema: str) -> dict[str, Any]:
-    """Load ``path`` as YAML, validate against ``schema`` and return a copy."""
+    """Load ``path`` as YAML, validate against ``schema`` and return a copy.
+
+    :param path: YAML file to read.
+    :param schema: Schema file name used for validation.
+    :returns: A deep copy of the validated mapping.
+    :raises BoardResolveError: If the file cannot be read, is not a mapping, or fails validation.
+
+    Example: ``_read_mapping("platforms/boards/glymur-crd.yaml", "board.schema.json")["platform"]``
+    returns ``{"name": "glymur-crd"}``.
+    """
     try:
         with open(path) as f:
             document = yaml.safe_load(f)
@@ -106,6 +122,12 @@ def _merge_partitions(base: list[dict[str, Any]], overlay: Sequence[Mapping[str,
     A same-named partition is deep-merged field-by-field in place (so an
     override can set only ``size`` and inherit the rest); a new partition is
     appended in overlay order. Nothing is ever moved or removed.
+
+    :param base: Partition list changed in place.
+    :param overlay: Partitions merged into ``base``.
+
+    Example: ``_merge_partitions(base, [{"name": "efi", "size": "8KB"}])`` changes only the
+    size of ``efi`` in ``base``.
     """
     index = {p["name"]: p for p in base if "name" in p}
     for entry in overlay:
@@ -121,7 +143,14 @@ def _merge_partitions(base: list[dict[str, Any]], overlay: Sequence[Mapping[str,
 
 
 def _merge_storage(base: dict[str, Any], overlay: Mapping[str, Any]) -> None:
-    """Merge one storage ``overlay`` into ``base`` (matched by id upstream)."""
+    """Merge one storage ``overlay`` into ``base`` (matched by id upstream).
+
+    :param base: Storage mapping changed in place.
+    :param overlay: Storage fields to merge; ``partitions`` and ``includes`` are merged,
+        other fields replace the base value.
+
+    Example: ``_merge_storage(storage, {"id": "ufs", "size": 2048})`` sets ``storage["size"]``.
+    """
     for key, value in overlay.items():
         if key == "id":
             continue
@@ -138,7 +167,13 @@ def _merge_storage(base: dict[str, Any], overlay: Mapping[str, Any]) -> None:
 
 
 def _merge_storage_list(base: list[dict[str, Any]], overlay: Sequence[Mapping[str, Any]]) -> None:
-    """Merge ``overlay`` storage entries into ``base`` by ``id``."""
+    """Merge ``overlay`` storage entries into ``base`` by ``id``.
+
+    :param base: Storage list changed in place.
+    :param overlay: Storages merged by ``id``; unmatched storages are appended.
+
+    Example: ``_merge_storage_list(board["storage"], overlay["storage"])``
+    """
     index = {s["id"]: s for s in base if "id" in s}
     for entry in overlay:
         sid = entry.get("id")
@@ -158,7 +193,16 @@ def _merge_storage_list(base: list[dict[str, Any]], overlay: Sequence[Mapping[st
 
 
 def _load_board_with_extends(path: str, root: str, chain: tuple[str, ...]) -> dict[str, Any]:
-    """Load a board file and fold its single base (if any) underneath it."""
+    """Load a board file and fold its single base (if any) underneath it.
+
+    :param path: Board file to load.
+    :param root: Platforms directory that ``extends`` paths resolve against.
+    :param chain: Real paths already visited, used to detect cycles.
+    :returns: The board with its base folded underneath it.
+    :raises BoardResolveError: On an ``extends`` cycle or an invalid file.
+
+    Example: ``_load_board_with_extends("platforms/boards/glymur-crd.yaml", "platforms", ())``
+    """
     real = os.path.realpath(path)
     if real in chain:
         raise BoardResolveError("extends cycle detected at %s" % path)
@@ -180,7 +224,16 @@ def _load_board_with_extends(path: str, root: str, chain: tuple[str, ...]) -> di
 
 
 def _fragment_partitions(path: str, root: str, chain: tuple[str, ...]) -> list[dict[str, Any]]:
-    """Resolve a ``_common/`` fragment (transitively) into a partition list."""
+    """Resolve a ``_common/`` fragment (transitively) into a partition list.
+
+    :param path: Fragment file to load.
+    :param root: Platforms directory that ``includes`` paths resolve against.
+    :param chain: Real paths already visited, used to detect cycles.
+    :returns: The fragment's partitions after its own includes.
+    :raises BoardResolveError: On an ``includes`` cycle or an invalid file.
+
+    Example: ``_fragment_partitions("platforms/_common/boot.yaml", "platforms", ())``
+    """
     real = os.path.realpath(path)
     if real in chain:
         raise BoardResolveError("includes cycle detected at %s" % path)
@@ -198,6 +251,12 @@ def _expand_includes(storage: dict[str, Any], root: str) -> None:
 
     Ordering: included fragments in listed order first, then the storage's own
     inline partitions, with same-named entries merged in place.
+
+    :param storage: Storage mapping changed in place.
+    :param root: Platforms directory that ``includes`` paths resolve against.
+    :raises BoardResolveError: If an included fragment is invalid or cyclic.
+
+    Example: ``_expand_includes(storage, "platforms")`` leaves ``storage`` without ``includes``.
     """
     includes = storage.pop("includes", [])
     expanded: list[dict[str, Any]] = []
@@ -214,11 +273,27 @@ def _expand_includes(storage: dict[str, Any], root: str) -> None:
 
 
 def _variant_path(root: str, axis: str, name: str) -> str:
+    """Return the file path of a variant overlay.
+
+    :param root: Platforms directory.
+    :param axis: Variant axis, ``hlos`` or ``boot-fw``.
+    :param name: Variant name without the ``.yaml`` suffix.
+    :returns: ``<root>/variants/<axis>/<name>.yaml``.
+
+    Example: ``_variant_path("platforms", "hlos", "debian")`` returns
+    ``"platforms/variants/hlos/debian.yaml"``.
+    """
     return os.path.join(root, "variants", axis, name + ".yaml")
 
 
 def _validate_resolved_storage(storage: Mapping[str, Any]) -> None:
-    """Validate a fully-resolved storage against the strict single-storage schema."""
+    """Validate a fully-resolved storage against the strict single-storage schema.
+
+    :param storage: Fully resolved storage.
+    :raises BoardResolveError: If the storage does not satisfy ``partitions.schema.json``.
+
+    Example: ``_validate_resolved_storage(board["storage"][0])`` returns ``None`` for a valid storage.
+    """
     disk = {k: storage[k] for k in _DISK_KEYS if k in storage}
     document = {"disk": disk, "partitions": storage.get("partitions", [])}
     try:
@@ -242,6 +317,15 @@ def resolve_board(
     and variant names resolve against; it defaults to the parent of the board
     file's directory when that directory is ``boards/``, else the board file's
     own directory.
+
+    :param path: Board file.
+    :param root: Platforms directory, or ``None`` to derive it.
+    :param hlos: HLOS variant name, or ``None``.
+    :param boot_fw: Boot firmware variant name, or ``None``.
+    :returns: The composed platform and storages.
+    :raises BoardResolveError: If a file is invalid, cyclic, or resolves to an invalid storage.
+
+    Example: ``len(resolve_board("platforms/boards/glymur-crd.yaml")["storage"])`` returns ``2``.
     """
     if root is None:
         parent = os.path.dirname(os.path.abspath(path))
@@ -276,7 +360,15 @@ def storage_to_loaded_spec(
     storage: Mapping[str, Any],
     image_map: Mapping[str, str] | None = None,
 ) -> LoadedSpec:
-    """Reduce one resolved storage to a LoadedSpec via the YAML loader helpers."""
+    """Reduce one resolved storage to a LoadedSpec via the YAML loader helpers.
+
+    :param storage: Fully resolved storage.
+    :param image_map: Partition name to image filename overrides.
+    :returns: The normalised disk settings and partitions.
+
+    Example: ``storage_to_loaded_spec(board["storage"][0])["disk"]["type"]`` returns ``"nvme"``
+    for Glymur-CRD.
+    """
     if image_map is None:
         image_map = {}
     disk = _disk_from_node(storage)
@@ -291,7 +383,15 @@ def board_to_specs(
     board: ResolvedBoard,
     image_map: Mapping[str, str] | None = None,
 ) -> list[tuple[str, LoadedSpec]]:
-    """Reduce a resolved board to ``[(storage_id, LoadedSpec), ...]`` in order."""
+    """Reduce a resolved board to ``[(storage_id, LoadedSpec), ...]`` in order.
+
+    :param board: Resolved board.
+    :param image_map: Partition name to image filename overrides.
+    :returns: Storage IDs paired with their normalised specifications.
+
+    Example: ``[sid for sid, _ in board_to_specs(board)]`` returns ``["nvme", "spinor"]``
+    for Glymur-CRD.
+    """
     return [
         (storage.get("id", ""), storage_to_loaded_spec(storage, image_map))
         for storage in board["storage"]

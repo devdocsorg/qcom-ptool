@@ -18,6 +18,13 @@ SUBCOMMANDS = {
 
 
 def _build_parser() -> argparse.ArgumentParser:
+    """Build the top-level ``qcom-ptool`` argument parser.
+
+    :returns: Parser that accepts ``-V/--version`` and one subcommand name.
+
+    Example: ``_build_parser().parse_known_args(["ptool", "-x", "partitions.xml"])``
+    separates ``ptool`` from its remaining arguments.
+    """
     parser = argparse.ArgumentParser(
         prog="qcom-ptool",
         description=(
@@ -42,6 +49,14 @@ def _build_parser() -> argparse.ArgumentParser:
 
 
 def main() -> None:
+    """Run the subcommand named on the command line.
+
+    The remaining arguments are passed to the subcommand module through
+    ``sys.argv``. An unknown subcommand makes argparse exit with status 2.
+
+    Example: ``qcom-ptool gen_partition -i partitions.conf -o partitions.xml``
+    calls this function.
+    """
     parser = _build_parser()
     args, rest = parser.parse_known_args()
 

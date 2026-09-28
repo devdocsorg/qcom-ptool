@@ -44,6 +44,12 @@ def partition_size_in_kb(size: str) -> int:
     Bare integers are interpreted as bytes and divided by 1024. Strings with a
     K/M/G suffix (any case, with optional 'B') return the kilobyte equivalent.
     Anything else raises ``ValueError``; callers may catch and reformat.
+
+    :param size: Size string.
+    :returns: Size in kilobytes.
+    :raises ValueError: If the string has letters but no K, M or G suffix.
+
+    Example: ``partition_size_in_kb("2MB")`` returns ``2048``.
     """
     if not re.search("[a-zA-Z]+", size):
         return int(size) // 1024
@@ -65,7 +71,13 @@ def partition_size_in_kb(size: str) -> int:
 
 
 def disk_options(argv: list[tuple[str, str]]) -> DiskParams:
-    """Translate parsed ``--disk`` options into the canonical disk dict."""
+    """Translate parsed ``--disk`` options into the canonical disk dict.
+
+    :param argv: ``(option, value)`` pairs from :func:`getopt.gnu_getopt`.
+    :returns: A copy of ``DISK_PARAMS_DEFAULTS`` updated from the options.
+
+    Example: ``disk_options([("--type", "ufs")])["type"]`` returns ``"ufs"``.
+    """
     disk = DISK_PARAMS_DEFAULTS.copy()
     for opt, arg in argv:
         if opt == "--type":
@@ -85,6 +97,13 @@ def disk_options(argv: list[tuple[str, str]]) -> DiskParams:
 
 
 def to_bool(arg: str) -> str:
+    """Normalise a boolean option value to ``"true"`` or ``"false"``.
+
+    :param arg: Option value; ``1``, ``y``, ``yes`` and ``true`` in any case are true.
+    :returns: ``"true"`` or ``"false"``.
+
+    Example: ``to_bool("Yes")`` returns ``"true"``.
+    """
     return "true" if arg.strip().lower() in ("1", "y", "yes", "true") else "false"
 
 
@@ -97,6 +116,13 @@ def partition_options(
     ``image_map`` (if provided) overrides the entry's ``filename`` when the
     partition name matches a key. The override is applied after all options
     have been processed, so it always wins over an explicit ``--filename``.
+
+    :param argv: ``(option, value)`` pairs from :func:`getopt.gnu_getopt`.
+    :param image_map: Partition name to image filename overrides.
+    :returns: The LUN or physical partition as a string, and the partition entry.
+    :raises ValueError: If a size, attribute, priority or retry value is malformed.
+
+    Example: ``partition_options([("--lun", "1"), ("--name", "xbl_a")])[0]`` returns ``"1"``.
     """
     if image_map is None:
         image_map = {}
@@ -177,7 +203,14 @@ _PARTITION_LONG_OPTS = [
 
 
 def parse_disk_line(line: str) -> DiskParams | None:
-    """Parse a single ``--disk ...`` line; return None if the line isn't one."""
+    """Parse a single ``--disk ...`` line; return None if the line isn't one.
+
+    :param line: One stripped line from a ``.conf`` file.
+    :returns: The disk settings, or ``None`` when the line is not a ``--disk`` line.
+    :raises getopt.GetoptError: If the line contains an unknown option.
+
+    Example: ``parse_disk_line("--disk --type=emmc --size=1024")["type"]`` returns ``"emmc"``.
+    """
     opts_list = line.split(" ")
     if not opts_list or opts_list[0] != "--disk":
         return None
@@ -189,7 +222,16 @@ def parse_partition_lines(
     lines: list[str],
     image_map: Mapping[str, str] | None = None,
 ) -> PartitionsByLun:
-    """Parse a list of ``--partition ...`` lines, grouped by LUN/phys-part."""
+    """Parse a list of ``--partition ...`` lines, grouped by LUN/phys-part.
+
+    :param lines: Stripped lines; lines that are not ``--partition`` lines are skipped.
+    :param image_map: Partition name to image filename overrides.
+    :returns: Partition entries grouped by LUN or physical partition.
+    :raises getopt.GetoptError: If a line contains an unknown option.
+
+    Example: ``parse_partition_lines(["--partition --name=efi --size=4KB"])["0"][0]["label"]``
+    returns ``"efi"``.
+    """
     if image_map is None:
         image_map = {}
     partitions: PartitionsByLun = {}
@@ -214,6 +256,13 @@ def read_conf(path: str) -> tuple[str, list[str]]:
     Comments (``#``-prefixed) and blank lines are skipped. Multiple ``--disk``
     lines are an error. Lines that aren't ``--disk`` or ``--partition`` are
     printed as "Ignoring ..." for parity with the original behaviour.
+
+    :param path: ``.conf`` file to read.
+    :returns: The ``--disk`` line and the ``--partition`` lines in file order.
+    :raises ConfParseError: If the file has no ``--disk`` line or more than one.
+
+    Example: ``read_conf("platforms/qcs6490-rb3gen2/ufs/partitions.conf")[0]`` returns the
+    ``--disk`` line.
     """
     disk_line: str | None = None
     partition_lines: list[str] = []
@@ -239,7 +288,15 @@ def read_conf(path: str) -> tuple[str, list[str]]:
 
 
 def load(path: str, image_map: Mapping[str, str] | None = None) -> LoadedSpec:
-    """Public entry point: read ``path`` and return a normalised ``LoadedSpec``."""
+    """Public entry point: read ``path`` and return a normalised ``LoadedSpec``.
+
+    :param path: ``.conf`` file to read.
+    :param image_map: Partition name to image filename overrides.
+    :returns: The normalised disk settings and partitions.
+    :raises ConfParseError: If the file has no ``--disk`` line or more than one.
+
+    Example: ``load("platforms/apq8016-sbc/emmc/partitions.conf")["disk"]["type"]`` returns ``"emmc"``.
+    """
     disk_line, partition_lines = read_conf(path)
     disk = parse_disk_line(disk_line)
     if disk is None:

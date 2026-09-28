@@ -28,6 +28,14 @@ def load(path: str, image_map: Mapping[str, str] | None = None) -> LoadedSpec:
     ``image_map`` overrides the ``--filename`` (or equivalent) for partitions
     whose name appears as a key. It's applied uniformly by every loader so
     the CLI ``-m`` flag works the same regardless of source format.
+
+    :param path: Layout file; ``.conf`` or no suffix uses the line format, ``.yaml``/``.yml`` YAML.
+    :param image_map: Partition name to image filename overrides.
+    :returns: The normalised disk settings and partitions.
+    :raises UnsupportedFormatError: For any other suffix.
+
+    Example: ``load("platforms/qcs6490-rb3gen2/ufs/partitions.conf")["disk"]["type"]``
+    returns ``"ufs"``.
     """
     suffix = os.path.splitext(path)[1].lower()
     if suffix in ("", ".conf"):

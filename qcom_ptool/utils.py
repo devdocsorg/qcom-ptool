@@ -6,6 +6,14 @@ import sys
 
 
 def EnsureDirectoryExists(filename):
+    """Create the parent directory of a file path when it does not exist.
+
+    :param filename: Path whose directory component must exist.
+    :type filename: str
+    :raises OSError: If the directory cannot be created.
+
+    Example: ``EnsureDirectoryExists("out/rawprogram0.xml")`` creates ``out/``.
+    """
     dir = os.path.dirname(filename)
     try:
         os.stat(dir)
@@ -14,6 +22,15 @@ def EnsureDirectoryExists(filename):
 
 
 def PrintBigWarning(sz, log_func=print):
+    """Print a large WARNING banner followed by an optional message.
+
+    :param sz: Message printed after the banner; an empty string prints only the banner.
+    :type sz: str
+    :param log_func: Function that receives each output line.
+    :type log_func: collections.abc.Callable
+
+    Example: ``PrintBigWarning("SECTOR_SIZE_IN_BYTES changed")``
+    """
     log_func("\t                          _             ")
     log_func("\t                         (_)            ")
     log_func("\t__      ____ _ _ __ _ __  _ _ __   __ _ ")
@@ -27,6 +44,16 @@ def PrintBigWarning(sz, log_func=print):
 
 
 def PrintBigError(sz, log_func=print):
+    """Print a large ERROR banner and exit when a message is supplied.
+
+    :param sz: Error message; a non-empty message ends the program with status 1.
+    :type sz: str
+    :param log_func: Function that receives each output line.
+    :type log_func: collections.abc.Callable
+    :raises SystemExit: With status 1 when ``sz`` is not empty.
+
+    Example: ``PrintBigError("ERROR: Could not find file")`` exits with status 1.
+    """
     log_func("\t _________________ ___________ ")
     log_func("\t|  ___| ___ \\ ___ \\  _  | ___ \\")
     log_func("\t| |__ | |_/ / |_/ / | | | |_/ /")
@@ -39,6 +66,17 @@ def PrintBigError(sz, log_func=print):
 
 
 def reflect(data, nBits):
+    """Reverse the order of the lowest ``nBits`` bits of an integer.
+
+    :param data: Value whose bits are reflected.
+    :type data: int
+    :param nBits: Number of low-order bits to reflect.
+    :type nBits: int
+    :returns: The reflected value.
+    :rtype: int
+
+    Example: ``reflect(0x01, 8)`` returns ``0x80``.
+    """
     reflection = 0x00000000
     for bit in range(nBits):
         if data & 0x01:
@@ -48,6 +86,17 @@ def reflect(data, nBits):
 
 
 def CalcCRC32(array, Len):
+    """Calculate the IEEE CRC-32 used in GPT headers and partition arrays.
+
+    :param array: Bytes, or a list of byte values, to checksum.
+    :type array: bytes | list[int]
+    :param Len: Number of leading bytes of ``array`` to include.
+    :type Len: int
+    :returns: The CRC-32 value, matching :func:`binascii.crc32`.
+    :rtype: int
+
+    Example: ``CalcCRC32(b"123456789", 9)`` returns ``0xCBF43926``.
+    """
     k = 8  # length of unit (i.e. byte)
     MSB = 0
     gx = 0x04C11DB7  # IEEE 32bit polynomial

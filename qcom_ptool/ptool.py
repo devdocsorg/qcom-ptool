@@ -122,6 +122,10 @@ NumWPregions = 0
 
 
 def ShowPartitionExample():
+    """Print an example ``partition.xml`` with two physical partitions.
+
+    Example: ``ShowPartitionExample()`` runs when ``-p`` names a missing physical partition.
+    """
     print('Your "partition.xml" file needs to look like something like this below')
     print("\t(i.e. notice the *multiple* physical_partition tags)\n")
     print("<!-- This is physical partition 0 -->")
@@ -142,12 +146,40 @@ def ShowPartitionExample():
 def ConvertKBtoSectors(x):
     ## 1KB / SECTOR_SIZE_IN_BYTES normally means return 2 (i.e. with SECTOR_SIZE_IN_BYTES=512)
     ## 2KB / SECTOR_SIZE_IN_BYTES normally means return 4 (i.e. with SECTOR_SIZE_IN_BYTES=512)
+    """Convert kilobytes to sectors of the current ``SECTOR_SIZE_IN_BYTES``.
+
+    :param x: Size in kilobytes.
+    :type x: int | float
+    :returns: Whole number of sectors.
+    :rtype: int
+
+    Example: ``ConvertKBtoSectors(1)`` returns ``2`` with 512-byte sectors.
+    """
     return int((x * 1024) // SECTOR_SIZE_IN_BYTES)
 
 
 def UpdatePatch(
     StartSector, ByteOffset, PHYPartition, size_in_bytes, szvalue, szfilename, szwhat
 ):
+    """Append a ``patch`` element to the global ``PatchesXML`` tree.
+
+    :param StartSector: Sector to patch, as text such as ``"NUM_DISK_SECTORS-1."``.
+    :type StartSector: str
+    :param ByteOffset: Byte offset within the sector, as text.
+    :type ByteOffset: str
+    :param PHYPartition: Physical partition (LUN) number.
+    :type PHYPartition: int
+    :param size_in_bytes: Number of bytes the patch writes.
+    :type size_in_bytes: int
+    :param szvalue: Value expression evaluated by the flashing tool.
+    :type szvalue: str
+    :param szfilename: File to patch, or ``DISK`` for the device itself.
+    :type szfilename: str
+    :param szwhat: Human-readable description of the patch.
+    :type szwhat: str
+
+    Example: ``UpdatePatch("1", "32", 0, 8, "NUM_DISK_SECTORS-1.", "DISK", "Update last LBA")``
+    """
     global PatchesXML
     SubElement(
         PatchesXML,
@@ -178,6 +210,36 @@ def UpdateRawProgram(
     readbackverify="false",
     partofsingleimage="false",
 ):
+    """Append a ``program`` element, and optionally an ``erase`` element, to a rawprogram tree.
+
+    A negative ``StartSector`` is written relative to ``NUM_DISK_SECTORS``. With the
+    ``-e`` option, every partition except ``cdt`` is erased before it is programmed.
+
+    :param RawProgramXML: Rawprogram tree that receives the elements.
+    :type RawProgramXML: xml.etree.ElementTree.Element
+    :param StartSector: First sector; negative values count back from the end of the disk.
+    :type StartSector: int
+    :param size_in_KB: Partition size in kilobytes.
+    :type size_in_KB: int | float
+    :param PHYPartition: Physical partition (LUN) number.
+    :type PHYPartition: int
+    :param file_sector_offset: Sector offset within the source file.
+    :type file_sector_offset: int
+    :param num_partition_sectors: Partition size in sectors; values below 1 become 0.
+    :type num_partition_sectors: int
+    :param filename: Image written to the partition, or an empty string.
+    :type filename: str
+    :param sparse: ``"true"`` when the image is a sparse image.
+    :type sparse: str
+    :param label: Partition label.
+    :type label: str
+    :param readbackverify: ``"true"`` to request read-back verification.
+    :type readbackverify: str
+    :param partofsingleimage: ``"true"`` when the image is part of a single disk image.
+    :type partofsingleimage: str
+
+    Example: ``UpdateRawProgram(RawProgramXML, 0, 0.5, 0, 0, 1, "gpt_main0.bin", "false", "PrimaryGPT")``
+    """
     if StartSector < 0:
         szStartSector = (
             "NUM_DISK_SECTORS%d." % StartSector
@@ -250,6 +312,15 @@ def UpdateRawProgram(
 
 def ValidGUIDForm(GUID):
 
+    """Report whether a value is written as a GUID that ptool accepts.
+
+    :param GUID: ``0x`` followed by 32 hex digits, or the dashed GUID form.
+    :type GUID: str | int
+    :returns: ``True`` when the value matches either form.
+    :rtype: bool
+
+    Example: ``ValidGUIDForm("C12A7328-F81F-11D2-BA4B-00A0C93EC93B")`` returns ``True``.
+    """
     if not isinstance(GUID, str):
         GUID = str(GUID)
 
@@ -274,6 +345,16 @@ def ValidGUIDForm(GUID):
 def ValidateTYPE(Type):
     # for type I must support the original "4C" and if they put "0x4C"
 
+    """Convert an MBR partition type to an integer.
+
+    :param Type: Integer from 0 to 255, or one or two hex digits with an optional ``0x``.
+    :type Type: int | str
+    :returns: The partition type byte.
+    :rtype: int
+    :raises SystemExit: With status 1 when the value is not a valid type.
+
+    Example: ``ValidateTYPE("0x4C")`` returns ``76``.
+    """
     if isinstance(Type, int) and Type >= 0 and Type <= 255:
         return Type
 
@@ -293,6 +374,17 @@ def ValidateTYPE(Type):
 
 def ValidateGUID(GUID):
 
+    """Convert a GPT partition type or unique GUID to its 128-bit integer form.
+
+    :param GUID: ``0x`` followed by 32 hex digits, or the dashed GUID form.
+    :type GUID: str | int
+    :returns: The GUID as stored in the GPT, or ``PARTITION_BASIC_DATA_GUID`` after a
+        warning when the value is not a GUID.
+    :rtype: int
+
+    Example: ``hex(ValidateGUID("C12A7328-F81F-11D2-BA4B-00A0C93EC93B"))`` returns
+    ``"0x3bc93ec9a0004bba11d2f81fc12a7328"``.
+    """
     if not isinstance(GUID, str):
         GUID = str(GUID)
 
@@ -357,6 +449,18 @@ def ValidateGUID(GUID):
 
 
 def WriteGPT(GPTMAIN, GPTBACKUP, GPTEMPTY):
+    """Write the primary, backup, combined and empty GPT image files.
+
+    :param GPTMAIN: Path for the protective MBR and primary GPT.
+    :type GPTMAIN: str
+    :param GPTBACKUP: Path for the backup GPT.
+    :type GPTBACKUP: str
+    :param GPTEMPTY: Path for a valid GPT with no usable partitions.
+    :type GPTEMPTY: str
+
+    Example: ``WriteGPT("gpt_main0.bin", "gpt_backup0.bin", "gpt_empty0.bin")`` also writes
+    the file named by the global ``GPTBOTH``.
+    """
     global opfile, PrimaryGPT, BackupGPT, GPTBOTH
     # for b in PrimaryGPT:
     #    opfile.write(struct.pack("B", b))
@@ -402,6 +506,10 @@ def WriteGPT(GPTMAIN, GPTBACKUP, GPTEMPTY):
 
 
 def FillInEmptyGPT():
+    """Fill the global ``EmptyGPT`` with a header and a single placeholder partition.
+
+    Example: ``FillInEmptyGPT()`` runs before :func:`WriteGPT` writes ``gpt_empty<N>.bin``.
+    """
     global EmptyGPT
 
     i = SECTOR_SIZE_IN_BYTES + 16
@@ -492,6 +600,19 @@ def FillInEmptyGPT():
 
 
 def UpdatePrimaryGPT(value, length, i):
+    """Store a little-endian value in the global ``PrimaryGPT`` byte list.
+
+    :param value: Value to store.
+    :type value: int
+    :param length: Number of bytes to write.
+    :type length: int
+    :param i: Byte offset of the first byte.
+    :type i: int
+    :returns: The offset after the written bytes.
+    :rtype: int
+
+    Example: ``UpdatePrimaryGPT(1, 8, i)`` writes the current LBA field and returns ``i + 8``.
+    """
     global PrimaryGPT
     for b in range(length):
         PrimaryGPT[i] = (int(value) >> (b * 8)) & 0xFF
@@ -500,6 +621,19 @@ def UpdatePrimaryGPT(value, length, i):
 
 
 def UpdateBackupGPT(value, length, i):
+    """Store a little-endian value in the global ``BackupGPT`` byte list.
+
+    :param value: Value to store.
+    :type value: int
+    :param length: Number of bytes to write.
+    :type length: int
+    :param i: Byte offset of the first byte.
+    :type i: int
+    :returns: The offset after the written bytes.
+    :rtype: int
+
+    Example: ``UpdateBackupGPT(1, 8, i)`` writes one field and returns ``i + 8``.
+    """
     global BackupGPT
     for b in range(length):
         BackupGPT[i] = (int(value) >> (b * 8)) & 0xFF
@@ -508,6 +642,13 @@ def UpdateBackupGPT(value, length, i):
 
 
 def ShowBackupGPT(sector):
+    """Print the first 512 bytes of one sector of the backup GPT as hex.
+
+    :param sector: Sector index within the backup GPT.
+    :type sector: int
+
+    Example: ``ShowBackupGPT(0)``
+    """
     global BackupGPT
     print("Sector: %d" % sector)
     for j in range(32):
@@ -520,6 +661,16 @@ def ShowBackupGPT(sector):
 
 
 def CreateFileOfZeros(filename, num_total_sectors):
+    """Write a file containing only zero bytes.
+
+    :param filename: File name, placed in the ``-t`` output folder when one is set.
+    :type filename: str
+    :param num_total_sectors: File size in sectors.
+    :type num_total_sectors: int
+    :raises SystemExit: With status 1 when the file cannot be written.
+
+    Example: ``CreateFileOfZeros("zeros_1sector.bin", 1)``
+    """
     if OutputFolder:
         filename = os.path.join(OutputFolder, filename)
     num_sectors = int(num_total_sectors)
@@ -542,6 +693,13 @@ def CreateFileOfZeros(filename, num_total_sectors):
 
 
 def CreateErasingRawProgramFiles():
+    """Write the zero files and the ``wipe_rawprogram_PHY<N>.xml`` files.
+
+    Each wipe file overwrites the MBR sector and the primary GPT, and the backup GPT
+    unless ``-n`` disabled patch generation, on physical partitions 0 to 7 except 3.
+
+    Example: ``CreateErasingRawProgramFiles()`` runs after the GPT files are created.
+    """
     global gen_patch
     CreateFileOfZeros("zeros_1sector.bin", 1)
     CreateFileOfZeros("zeros_%dsectors.bin" % BackupGPTNumLBAs, BackupGPTNumLBAs)
@@ -606,6 +764,21 @@ SizeOfPartitionArray = 0
 
 
 def CreateGPTPartitionTable(PhysicalPartitionNumber, UserProvided=False):
+    """Build the GPT, rawprogram and patch files for one physical partition.
+
+    Partitions from the parsed XML are placed in order, aligned to the write-protect
+    boundary where requested, and written to ``gpt_main<N>.bin``, ``gpt_backup<N>.bin``,
+    ``gpt_both<N>.bin``, ``gpt_empty<N>.bin``, ``rawprogram<N>.xml``, ``patch<N>.xml``,
+    and the ``rawprogram<N>_BLANK_GPT.xml`` and ``rawprogram<N>_WIPE_PARTITIONS.xml`` variants.
+
+    :param PhysicalPartitionNumber: Physical partition (LUN) number ``N``.
+    :type PhysicalPartitionNumber: int
+    :param UserProvided: ``True`` when ``N`` came from ``-p``; a missing partition then exits.
+    :type UserProvided: bool
+    :raises SystemExit: When a user-selected partition is missing or the layout is invalid.
+
+    Example: ``CreateGPTPartitionTable(0)`` writes ``gpt_main0.bin`` and ``rawprogram0.xml``.
+    """
     global opfile, PhyPartition, PrimaryGPT, BackupGPT, EmptyGPT, RawProgramXML, GPTMAIN, GPTBACKUP, GPTBOTH, RAW_PROGRAM, PATCHES, PrimaryGPTNumLBAs, BackupGPTNumLBAs
     global gen_patch
 
@@ -1708,12 +1881,30 @@ def CreateGPTPartitionTable(PhysicalPartitionNumber, UserProvided=False):
 
 
 def AlignVariablesToEqualSigns(sz):
+    """Remove spaces and tabs around ``=`` signs.
+
+    :param sz: Text such as the body of ``parser_instructions``.
+    :type sz: str
+    :returns: The text with ``name = value`` rewritten as ``name=value``.
+    :rtype: str
+
+    Example: ``AlignVariablesToEqualSigns("A = 1")`` returns ``"A=1"``.
+    """
     temp = re.sub(r"(\t| )+=", "=", sz)
     temp = re.sub(r"=(\t| )+", "=", temp)
     return temp
 
 
 def ReturnArrayFromSpaceSeparatedList(sz):
+    """Split whitespace-separated text into a list.
+
+    :param sz: Text to split.
+    :type sz: str
+    :returns: The items in order.
+    :rtype: list[str]
+
+    Example: ``ReturnArrayFromSpaceSeparatedList(" A=1  B=2 ")`` returns ``["A=1", "B=2"]``.
+    """
     temp = re.sub(r"\s+|\n", " ", sz)
     temp = re.sub(r"^\s+", "", temp)
     temp = re.sub(r"\s+$", "", temp)
@@ -1721,6 +1912,17 @@ def ReturnArrayFromSpaceSeparatedList(sz):
 
 
 def ParseXML(XMLFile):
+    """Load a partition XML file into the global partition tables.
+
+    ``parser_instructions`` set disk options such as ``SECTOR_SIZE_IN_BYTES``; each
+    ``physical_partition`` becomes one entry of ``PhyPartition``.
+
+    :param XMLFile: Partition XML file, usually generated by ``gen_partition``.
+    :type XMLFile: str
+    :raises SystemExit: When an instruction or partition attribute is invalid.
+
+    Example: ``ParseXML("partitions.xml")``
+    """
     global OutputToCreate, NumPhyPartitions, PartitionCollection, PhyPartition, MinSectorsNeeded, SECTOR_SIZE_IN_BYTES
 
     root = ET.parse(XMLFile)
@@ -2275,6 +2477,10 @@ def ValidatePartitions():
       - A/B slot pairing is checked across all LUNs, since some boot
         firmware (e.g. xbl_a on LUN1, xbl_b on LUN2) is split across
         separate boot LUNs by design.
+
+    :raises SystemExit: With status 1 when a duplicate name or unpaired slot is found.
+
+    Example: ``ValidatePartitions()`` exits when LUN 0 has two ``efi`` partitions.
     """
     errors = []
     bases_a: set[str] = set()
@@ -2310,6 +2516,13 @@ def PrintPartitionCollection(PartitionCollection):
 
     # print PartitionCollection
 
+    """Print each partition dictionary and its fields.
+
+    :param PartitionCollection: Partitions of one physical partition.
+    :type PartitionCollection: list[dict]
+
+    Example: ``PrintPartitionCollection(PhyPartition[0])``
+    """
     for Partition in PartitionCollection:
         print(Partition)
         print(" ")
@@ -2320,6 +2533,15 @@ def PrintPartitionCollection(PartitionCollection):
 
 
 def ParseCommandLine():
+    """Read the XML file, table format and physical partition from positional arguments.
+
+    This handles the older ``ptool.py <xml> [mbr|gpt] [N]`` form; ``-x`` options are
+    handled by the script's main code.
+
+    :raises SystemExit: With status 1 when the physical partition is not a number.
+
+    Example: ``ParseCommandLine()`` with ``sys.argv == ["ptool", "partition.xml", "gpt", "0"]``
+    """
     global XMLFile, OutputToCreate, PhysicalPartitionNumber
 
     print("\nArgs")
@@ -2361,6 +2583,18 @@ def ParseCommandLine():
 
 # Updates the WriteProtect hash that is used in creating emmc_lock_regions.xml
 def UpdateWPhash(Start, Size):
+    """Extend the write-protect regions so they cover a partition.
+
+    The regions are later written to ``emmc_lock_regions.xml``. Nothing is recorded
+    when ``WRITE_PROTECT_BOUNDARY_IN_KB`` is 0.
+
+    :param Start: First sector of the partition.
+    :type Start: int
+    :param Size: Partition size in sectors.
+    :type Size: int
+
+    Example: ``UpdateWPhash(34, 1024)``
+    """
     global hash_w, NumWPregions
 
     if HashInstructions["WRITE_PROTECT_BOUNDARY_IN_KB"] == 0:
@@ -2483,6 +2717,17 @@ def UpdateWPhash(Start, Size):
 
 
 def HexPrettyPrint(data, Length):
+    """Format bytes as a hex and ASCII dump.
+
+    :param data: Bytes or byte values to show.
+    :type data: bytes | list[int]
+    :param Length: Number of bytes to include.
+    :type Length: int
+    :returns: The formatted dump, or a single space when ``data`` is empty.
+    :rtype: str
+
+    Example: ``print(HexPrettyPrint(b"EFI PART", 8))``
+    """
     szNum = ""
     szAsc = ""
     digest = ""
@@ -2537,20 +2782,49 @@ def HexPrettyPrint(data, Length):
 
 
 def ReturnLow32bits(var):
+    """Return the low 32 bits of an integer.
+
+    :param var: Value to mask.
+    :type var: int
+    :returns: ``var & 0xFFFFFFFF``.
+    :rtype: int
+
+    Example: ``ReturnLow32bits(0x123456789)`` returns ``0x23456789``.
+    """
     return var & 0xFFFFFFFF
 
 
 def ReturnHigh32bits(var):
+    """Return bits 32 to 63 of an integer.
+
+    :param var: Value to shift and mask.
+    :type var: int
+    :returns: ``(var >> 32) & 0xFFFFFFFF``.
+    :rtype: int
+
+    Example: ``ReturnHigh32bits(0x123456789)`` returns ``1``.
+    """
     return (var >> 32) & 0xFFFFFFFF
 
 
 def PrintBanner(sz):
+    """Print a message between two lines of ``=`` characters.
+
+    :param sz: Message to print.
+    :type sz: str
+
+    Example: ``PrintBanner("Basic Usage")``
+    """
     print("\n" + "=" * 78)
     print(sz)
     print("=" * 78 + "\n")
 
 
 def ShowUsage():
+    """Print the ptool command-line usage.
+
+    Example: ``qcom-ptool ptool`` without ``-x`` prints this text.
+    """
     PrintBanner("Basic Usage")
     print("python ptool.py -x partition.xml")
     PrintBanner("Advanced Usage")
@@ -2583,6 +2857,12 @@ def ShowUsage():
 
 
 def CreateFinalPartitionBin():
+    """Join ``partition0.bin`` to ``partition2.bin`` into ``partition.bin``.
+
+    Each part is padded with zeros to 8192 bytes; missing parts become zeros.
+
+    Example: ``CreateFinalPartitionBin()`` runs after an MBR table is created.
+    """
     global OutputFolder
 
     with open("%spartition.bin" % OutputFolder, "wb") as opfile:
@@ -2604,7 +2884,15 @@ def CreateFinalPartitionBin():
 
 
 def prettify(elem):
-    """Return a pretty-printed XML string for the Element."""
+    """Return a pretty-printed XML string for the Element.
+
+    :param elem: Element to format.
+    :type elem: xml.etree.ElementTree.Element
+    :returns: Indented XML text with an XML declaration.
+    :rtype: str
+
+    Example: ``prettify(Element("data"))`` returns an XML declaration line followed by ``<data/>``.
+    """
     rough_string = ET.tostring(elem, "utf-8")
     reparsed = minidom.parseString(rough_string)
     return reparsed.toprettyxml(indent="  ")
@@ -2614,6 +2902,26 @@ def UpdatePartitionTable(Bootable, Type, StartSector, Size, Offset, Record):
 
     # print "Size = %i" % Size
 
+    """Write one 16-byte MBR partition entry into a record.
+
+    :param Bootable: ``"true"`` to set the boot indicator.
+    :type Bootable: str
+    :param Type: Partition type accepted by :func:`ValidateTYPE`.
+    :type Type: int | str
+    :param StartSector: First sector of the partition.
+    :type StartSector: int
+    :param Size: Partition size in sectors.
+    :type Size: int
+    :param Offset: Byte offset of the entry within ``Record``.
+    :type Offset: int
+    :param Record: MBR or EBR byte list changed in place.
+    :type Record: list[int]
+    :returns: ``Record``.
+    :rtype: list[int]
+    :raises SystemExit: With status 1 when ``Type`` is invalid.
+
+    Example: ``UpdatePartitionTable("false", "0x0C", 2048, 4096, 446, MBR)``
+    """
     Bootable = 128 if Bootable == "true" else 0
 
     Type = ValidateTYPE(Type)
@@ -2649,6 +2957,17 @@ def UpdatePartitionTable(Bootable, Type, StartSector, Size, Offset, Record):
 
 # This function called first, then calls CreateMasterBootRecord and CreateExtendedBootRecords
 def CreateMBRPartitionTable(PhysicalPartitionNumber):
+    """Build the MBR, EBR, rawprogram and patch files for one physical partition.
+
+    Up to four partitions fit in the MBR; more partitions use an extended partition
+    with one EBR each.
+
+    :param PhysicalPartitionNumber: Physical partition (LUN) number ``N``.
+    :type PhysicalPartitionNumber: int
+    :raises SystemExit: When physical partition ``N`` does not exist.
+
+    Example: ``CreateMBRPartitionTable(0)`` writes ``MBR0.bin``, ``EBR0.bin`` and ``rawprogram0.xml``.
+    """
     global PhyPartition, opfile, RawProgramXML, HashInstructions, ExtendedPartitionBegins, MBR, PARTITIONBIN, MBRBIN, EBRBIN, PATCHES, RAW_PROGRAM
 
     k = PhysicalPartitionNumber
@@ -2781,6 +3100,15 @@ def CreateMBRPartitionTable(PhysicalPartitionNumber):
 
 # CreateMasterBootRecord(k,len(PhyPartition[k]) )
 def CreateMasterBootRecord(k, NumMBRPartitions):
+    """Fill the global ``MBR`` with a disk signature and primary partition entries.
+
+    :param k: Physical partition (LUN) number.
+    :type k: int
+    :param NumMBRPartitions: Number of partitions placed in the MBR.
+    :type NumMBRPartitions: int
+
+    Example: ``CreateMasterBootRecord(0, 3)``
+    """
     global PhyPartition, HashInstructions, MBR, FirstLBA, LastLBA
     print(
         "\nInside CreateMasterBootRecord(%d) -------------------------------------"
@@ -2964,6 +3292,15 @@ def CreateMasterBootRecord(k, NumMBRPartitions):
 
 # CreateExtendedBootRecords(k,len(PhyPartition[k])-3)
 def CreateExtendedBootRecords(k, NumEBRPartitions):
+    """Add the extended partition to the MBR and build its chain of EBRs.
+
+    :param k: Physical partition (LUN) number.
+    :type k: int
+    :param NumEBRPartitions: Number of logical partitions to place in EBRs.
+    :type NumEBRPartitions: int
+
+    Example: ``CreateExtendedBootRecords(0, 5)``
+    """
     global PhyPartition, HashInstructions, MBR, EBR, FirstLBA, LastLBA, ExtendedPartitionBegins
     print(
         "\nInside CreateExtendedBootRecords(%d) -----------------------------------------"
@@ -3382,6 +3719,17 @@ def ReturnNumSectorsTillBoundary(CurrentLBA, BoundaryInKB):
 
     ##import pdb; pdb.set_trace()
 
+    """Return the sectors needed to reach the next alignment boundary.
+
+    :param CurrentLBA: Current sector.
+    :type CurrentLBA: int
+    :param BoundaryInKB: Boundary in kilobytes; 0 disables alignment.
+    :type BoundaryInKB: int
+    :returns: Sectors to add, or 0 when already aligned.
+    :rtype: int
+
+    Example: ``ReturnNumSectorsTillBoundary(129024, 65536)`` returns ``2048`` with 512-byte sectors.
+    """
     x = 0
     if BoundaryInKB > 0 and (CurrentLBA % ConvertKBtoSectors(BoundaryInKB)) > 0:
         x = ConvertKBtoSectors(BoundaryInKB) - (
@@ -3393,18 +3741,37 @@ def ReturnNumSectorsTillBoundary(CurrentLBA, BoundaryInKB):
 
 
 def WriteMBR():
+    """Write the global ``MBR`` bytes to the open global ``opfile``.
+
+    Example: ``WriteMBR()``
+    """
     global opfile, MBR
     for b in MBR:
         opfile.write(struct.pack("B", b))
 
 
 def WriteEBR():
+    """Write the global ``EBR`` bytes to the open global ``opfile``.
+
+    Example: ``WriteEBR()``
+    """
     global opfile, EBR
     for b in EBR:
         opfile.write(struct.pack("B", b))
 
 
 def find_file(filename, search_paths):
+    """Find a file in the search paths, then in the current directory.
+
+    :param filename: File name or path to find.
+    :type filename: str
+    :param search_paths: Directories searched before the current directory.
+    :type search_paths: list[str]
+    :returns: The path found, or ``None``.
+    :rtype: str | None
+
+    Example: ``find_file("partitions.xml", ["platforms/qcs6490-rb3gen2/ufs"])``
+    """
     print("\n\n\tLooking for ", filename)
     print("\t" + "-" * 40)
     for x in search_paths:
@@ -3576,6 +3943,10 @@ PrintBanner("OutputToCreate ===> '%s'" % OutputToCreate)
 
 
 def InitializeXMLFileVars():
+    """Create empty rawprogram, patch and lock-region XML trees for one physical partition.
+
+    Example: ``InitializeXMLFileVars()`` runs before each :func:`CreateGPTPartitionTable` call.
+    """
     global EmmcLockRegionsXML, RawProgramXML, RawProgramXML_Wipe, PatchesXML, RawProgramXML_Blank, PatchesXML_Blank
 
     EmmcLockRegionsXML = Element("protect")
