@@ -91,6 +91,31 @@ See [CONTRIBUTING.md file](CONTRIBUTING.md) for instructions on how to send
 code contributions to this project. You can also [report an issue on
 GitHub](../../issues).
 
+# Branches
+
+| Branch | Purpose and status | Build from it | Contributions |
+| --- | --- | --- | --- |
+| `main` | Default and only branch, holding the tool, platform layouts, and tests; last commit on 2026-09-27 ([history](https://github.com/qualcomm-linux/qcom-ptool/commits/main)); no support policy is documented | Yes | See [CONTRIBUTING.md](CONTRIBUTING.md) |
+
+This table lists every current branch. [BRANCHES.md](BRANCHES.md) describes branch
+maintenance.
+
+# Documentation
+
+Open [docs/site/index.html](docs/site/index.html) directly in a browser for the
+generated site; the [documentation guide](docs/README.md) explains how to rebuild it.
+
+- [Tutorial](docs/source/user/USAGE.md): generate the partition files for one board.
+- [Configuration reference](docs/source/user/CONFIGURATION.md): layout formats, build variables, and tool settings.
+- [Development setup](docs/source/contributing/DEVELOPMENT.md): install the tools and run the checks.
+- [Function reference](docs/source/contributing/README.md#function-reference): generated from the Python and Rust source comments.
+
+# Support
+
+Ask questions and report problems in
+[GitHub issues](https://github.com/qualcomm-linux/qcom-ptool/issues). Report
+vulnerabilities privately as described in [SECURITY.md](SECURITY.md).
+
 # Maintainer(s)
 
 See [CODEOWNERS](.github/CODEOWNERS).
@@ -100,3 +125,67 @@ See [CODEOWNERS](.github/CODEOWNERS).
 This project is licensed under the [BSD-3-clause
 License](https://spdx.org/licenses/BSD-3-Clause.html). See
 [LICENSE](LICENSE) for the full license text.
+Notices for the reused documentation files are in [NOTICE.md](NOTICE.md).
+
+# Repository contents
+
+## Folders
+
+- [.github/](.github/) — Holds [CODEOWNERS](.github/CODEOWNERS), the [issue templates](.github/ISSUE_TEMPLATE/), the [pull request template](.github/PULL_REQUEST_TEMPLATE/pr_template.md), the [CI workflows](.github/workflows/), and the documentation scripts [finalise_site.py](.github/finalise_site.py), [check_offline.py](.github/check_offline.py), and [test_reference_coverage.py](.github/test_reference_coverage.py).
+- [degpt/](degpt/README.md) — Contains a Rust tool that writes a partition XML from existing GPT images.
+- [docs/](docs/README.md) — Contains the documentation source, the generated site, and the build entry point.
+- [platforms/](platforms/README.md) — Contains the partition layouts and flashing templates for each board and storage.
+- [qcom_ptool/](qcom_ptool/README.md) — Contains the Python package behind the `qcom-ptool` command.
+- [tests/](tests/README.md) — Contains the unit tests and the integration checks for generated files.
+
+## Files
+
+- [.env.example](.env.example) — Lists the optional environment and build settings with safe values.
+- [.gitignore](.gitignore) — Keeps generated platform files, build output, and documentation caches out of Git.
+- [BRANCHES.md](BRANCHES.md) — Describes the purpose and maintenance of each long-lived branch.
+- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) — States participation standards and how to report conduct concerns.
+- [CONTRIBUTING.md](CONTRIBUTING.md) — Points to the contribution guide and development setup.
+- [LICENSE](LICENSE) — Contains the project's BSD-3-Clause licence.
+- [Makefile](Makefile) — Builds all platform outputs and runs the lint, test, and integration targets.
+- [NOTICE.md](NOTICE.md) — Keeps the notices for documentation files and templates adapted from other projects.
+- [README.md](README.md) — Introduces the project, its branches, documentation, and contents.
+- [SECURITY.md](SECURITY.md) — Gives the private route for reporting vulnerabilities.
+- [pyproject.toml](pyproject.toml) — Declares the Python package, its dependencies, and the lint and test settings.
+
+<!-- repository-map:start -->
+
+## Repository map
+
+```mermaid
+flowchart LR
+    r0["qcom-ptool (you are here)"]
+    click r0 href "https://github.com/qualcomm-linux/qcom-ptool" _blank
+    r1["kernel-config"]
+    click r1 href "https://github.com/qualcomm-linux/kernel-config" _blank
+    r2["meta-qcom"]
+    click r2 href "https://github.com/qualcomm-linux/meta-qcom" _blank
+    r3["meta-qcom-3rdparty"]
+    click r3 href "https://github.com/qualcomm-linux/meta-qcom-3rdparty" _blank
+    r4["qcom-build-utils"]
+    click r4 href "https://github.com/qualcomm-linux/qcom-build-utils" _blank
+    r5["qcom-deb-images"]
+    click r5 href "https://github.com/qualcomm-linux/qcom-deb-images" _blank
+    r6["rpm-images"]
+    click r6 href "https://github.com/qualcomm-linux/rpm-images" _blank
+    r7["cbsp-boot-utilities"]
+    click r7 href "https://github.com/qualcomm/cbsp-boot-utilities" _blank
+    r2 -->|"gets partition tools from"| r0
+    r3 -->|"adds third-party board support to"| r2
+    r5 -->|"gets partition tools from"| r0
+    r6 -->|"gets partition tools from"| r0
+    r1 -->|"gets partition tools from"| r0
+    r4 -->|"runs partition tools from"| r0
+    r7 -->|"gets partition layouts from"| r0
+    style r0 fill:#e6f3ff,stroke:#0969da,stroke-width:3px,color:#182c43
+```
+
+[Full Qualcomm repository map](https://github.com/devdocsorg/qualcomm-repository-map).
+
+<!-- Generated from https://github.com/devdocsorg/qualcomm-repository-map at 8748be393baca434763a1ba7a0b1e20ad5c66bea; dataset SHA-256: 3bbed606d885d380c3818cdf10372d8f364f871be1f25453e7743c08e09ac059. -->
+
+<!-- repository-map:end -->
