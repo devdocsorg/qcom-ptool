@@ -33,6 +33,15 @@ retain normal blkid probing. The rules use
 Run `qcom-ptool <subcommand> -h` to see the options accepted by each
 subcommand.
 
+# Branches
+
+| Branch | Purpose and status | Use | Contributions |
+| --- | --- | --- | --- |
+| `main` | Default and only branch, holding the tool and all partition layouts | Install and build from it | Accepted through the [contribution guide](docs/source/contributing/CONTRIBUTING.md) |
+
+This table lists every current branch. [BRANCHES.md](BRANCHES.md) describes branch
+maintenance.
+
 # Documentation
 
 Build the documentation site with `make -f docs/source/Makefile setup html` from
@@ -64,3 +73,28 @@ See [CODEOWNERS](.github/CODEOWNERS).
 This project is licensed under the [BSD-3-clause
 License](https://spdx.org/licenses/BSD-3-Clause.html). See
 [LICENSE](LICENSE) for the full license text.
+
+# Repository layout
+
+## Folders
+
+- [.github/](.github/) — Holds [CODEOWNERS](.github/CODEOWNERS), the [CI workflows](.github/workflows/), the [issue](.github/ISSUE_TEMPLATE/) and [pull request](.github/PULL_REQUEST_TEMPLATE/pr_template.md) templates, and the documentation build scripts.
+- [degpt/](degpt/README.md) — Contains a Rust tool that converts GPT images back into a ptool partition XML file.
+- [docs/](docs/README.md) — Contains the documentation source and explains how to build the site.
+- [platforms/](platforms/README.md) — Holds the partition layouts and contents templates for each supported board.
+- [qcom_ptool/](qcom_ptool/README.md) — Contains the Python package behind the `qcom-ptool` command.
+- [tests/](tests/README.md) — Holds the unit tests and the integration checks for generated files.
+
+## Files
+
+- [.env.example](.env.example) — Documents the environment settings the tool and Makefile read.
+- [.gitignore](.gitignore) — Keeps generated partition files, Python caches, and the documentation build out of Git.
+- [BRANCHES.md](BRANCHES.md) — Describes the purpose and maintenance of each long-lived branch.
+- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) — States participation standards and how to report conduct concerns.
+- [CONTRIBUTING.md](CONTRIBUTING.md) — Points to the contribution guide and development setup.
+- [LICENSE](LICENSE) — Contains the project's BSD-3-Clause licence text.
+- [Makefile](Makefile) — Builds every platform's partition files and runs the lint, test, and integration checks.
+- [NOTICE.md](NOTICE.md) — Retains the notices for adapted documentation tooling and templates.
+- [README.md](README.md) — Introduces the project, its branches, documentation, and contents.
+- [SECURITY.md](SECURITY.md) — Explains how to report a vulnerability privately.
+- [pyproject.toml](pyproject.toml) — Declares the Python package, its dependencies, and the ruff, mypy, and pytest settings.
