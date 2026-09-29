@@ -9,6 +9,24 @@ use std::io::Write;
 
 use degpt::mygpt::*;
 
+/// Convert GPT images into a ptool `partitions.xml` file.
+///
+/// The first argument names the XML file to create. Each further argument is a
+/// `gpt_both*.bin` image for a disk with 4096-byte sectors: its header is read
+/// from byte offset 0x1000 and its 128-byte entries from 0x2000. Every entry with
+/// a non-nil partition GUID is printed and written as a `<partition>` element with
+/// its name, size in KiB, type GUID, and read-only flag (attribute bit 60).
+///
+/// # Errors
+///
+/// Returns an error when no XML file name is given, a file cannot be created,
+/// read, or written, or a header or entry cannot be parsed.
+///
+/// # Examples
+///
+/// ```text
+/// degpt partitions.xml gpt_both0.bin gpt_both1.bin
+/// ```
 fn main() -> Result<(), Box<dyn Error>> {
     let mut args = env::args().skip(1);
 
