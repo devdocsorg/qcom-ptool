@@ -33,57 +33,21 @@ retain normal blkid probing. The rules use
 Run `qcom-ptool <subcommand> -h` to see the options accepted by each
 subcommand.
 
+# Documentation
+
+Build the documentation site with `make -f docs/source/Makefile setup html` from
+the repository root, then open `docs/site/index.html` directly in a browser. The
+[documentation guide](docs/README.md) explains where its source lives.
+
+- [Tutorial](docs/source/user/USAGE.md) — Generate one board's partition tables and flashing files.
+- [Configuration reference](docs/source/user/CONFIGURATION.md) — Understand layout files, board files, and environment settings.
+- [Function reference](docs/source/contributing/README.md#function-reference) — Browse the documented functions of every source file.
+- [Development setup](docs/source/contributing/DEVELOPMENT.md) — Install the tools, run the checks, and build the documentation.
+
 # Development
 
-## Dependencies
-
-At runtime the tool targets Python 3.8+ and depends on two third-party
-libraries, `PyYAML` and `jsonschema`, used to load and validate the YAML
-partition source. Both are declared in `pyproject.toml` and pulled in
-automatically by `pip install .`.
-
-For development, `make lint` invokes `ruff` and `mypy` and `make unit-test`
-runs the `pytest` suite under `tests/unit/`. On Debian/Ubuntu, install
-them as follows (ruff is not packaged in apt on all releases/architectures,
-so we install it from snap):
-
-```sh
-sudo snap install ruff
-sudo apt install mypy python3-pytest
-```
-
-## Makefile targets
-
-| Target        | Description                                                |
-|---------------|------------------------------------------------------------|
-| `all`         | Generate partition XML and GPT binaries for all platforms  |
-| `lint`        | Run ruff (linter) and mypy (type checker) on the package   |
-| `unit-test`   | Run the pytest suite under `tests/unit/`                   |
-| `integration` | Build all platforms and verify generated files are present |
-| `check`       | Run `lint`, `unit-test`, and `integration`                 |
-| `install`     | Install the package (`pip install .`)                      |
-| `clean`       | Remove generated XML and binary files from platforms/      |
-
-The Makefile invokes `qcom-ptool` from `PATH`. Install the package (or
-`pip install -e .` from the repo root) before running `make all`.
-
-### Quick start
-
-```sh
-# install the tool
-pip install -e .
-
-# install linters and test runner (Debian/Ubuntu)
-sudo snap install ruff
-sudo apt install mypy python3-pytest
-
-# run linters and unit tests
-make lint
-make unit-test
-
-# build all platforms and run tests
-make check
-```
+The [development setup](docs/source/contributing/DEVELOPMENT.md) lists the
+dependencies, Makefile targets, and quick start for changing and checking the tool.
 
 ## Code contributions
 

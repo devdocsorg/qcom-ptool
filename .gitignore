@@ -12,3 +12,10 @@ __pycache__/
 build/
 dist/
 *.egg-info/
+
+# Documentation environment, build caches, and generated site: build the site
+# locally with make -f docs/source/Makefile setup html.
+.docs-venv/
+docs/.doctrees/
+docs/site/
+docs/source/contributing/.generated/
