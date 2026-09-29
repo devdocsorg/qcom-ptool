@@ -10,7 +10,7 @@ In general, contributors should develop on branches based off of `main` and pull
 
 ## Submitting a pull request
 
-1. Please read our [code of conduct](CODE-OF-CONDUCT.md) and [license](LICENSE).
+1. Please read our [code of conduct](CODE_OF_CONDUCT.md) and [license](LICENSE).
 1. Fork and clone the repository.
 1. Create a new branch based on `main`: `git checkout -b <my-branch-name> main`.
 1. Make your changes, add tests, and make sure the tests still pass.
