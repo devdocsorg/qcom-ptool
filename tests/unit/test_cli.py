@@ -17,6 +17,14 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
 def subprocess_env():
+    """Return a copy of the environment with the repository root first on ``PYTHONPATH``.
+
+    Returns:
+        dict[str, str]: Environment for a subprocess that imports ``qcom_ptool`` from this checkout.
+
+    Example:
+        ``subprocess.run(command, env=subprocess_env())``
+    """
     env = os.environ.copy()
     existing = env.get("PYTHONPATH")
     env["PYTHONPATH"] = (
@@ -28,6 +36,17 @@ def subprocess_env():
 
 
 def run_cli(*args):
+    """Run ``python -m qcom_ptool.cli`` with the given arguments and capture its output.
+
+    Args:
+        *args (str): Command-line arguments passed to the dispatcher.
+
+    Returns:
+        subprocess.CompletedProcess[str]: The finished process with text stdout and stderr.
+
+    Example:
+        ``run_cli("--version").returncode`` is ``0``.
+    """
     return subprocess.run(
         [sys.executable, "-m", "qcom_ptool.cli", *args],
         capture_output=True,
@@ -37,12 +56,22 @@ def run_cli(*args):
 
 
 def test_version_flag():
+    """Check that ``--version`` exits successfully and prints the package version.
+
+    Example:
+        ``pytest tests/unit/test_cli.py::test_version_flag``
+    """
     result = run_cli("--version")
     assert result.returncode == 0
     assert __version__ in result.stdout
 
 
 def test_help_lists_all_subcommands():
+    """Check that ``--help`` names every registered subcommand.
+
+    Example:
+        ``pytest tests/unit/test_cli.py::test_help_lists_all_subcommands``
+    """
     result = run_cli("--help")
     assert result.returncode == 0
     for name in SUBCOMMANDS:
@@ -50,6 +79,11 @@ def test_help_lists_all_subcommands():
 
 
 def test_unknown_subcommand_rejected():
+    """Check that an unknown subcommand exits with status 2 and is named in the error.
+
+    Example:
+        ``pytest tests/unit/test_cli.py::test_unknown_subcommand_rejected``
+    """
     result = run_cli("frobnicate")
     assert result.returncode == 2
     assert "frobnicate" in result.stderr
@@ -57,6 +91,15 @@ def test_unknown_subcommand_rejected():
 
 @pytest.mark.parametrize("name", sorted(SUBCOMMANDS))
 def test_subcommand_dispatch(name, tmp_path):
+    """Check that each subcommand reaches its script, which fails without arguments.
+
+    Args:
+        name (str): Subcommand name supplied by the parametrisation.
+        tmp_path (pathlib.Path): Per-test temporary directory from pytest, used as the working directory.
+
+    Example:
+        ``pytest "tests/unit/test_cli.py::test_subcommand_dispatch[ptool]"``
+    """
     # Scripts exit non-zero without args; tmp_path because ptool writes files to CWD.
     result = subprocess.run(
         [sys.executable, "-m", "qcom_ptool.cli", name],

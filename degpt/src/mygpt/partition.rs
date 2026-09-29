@@ -35,6 +35,24 @@ pub struct Partition {
 }
 
 impl fmt::Display for Partition {
+    /// Write the partition's name, GUIDs, LBA span, and flags on separate lines.
+    ///
+    /// # Arguments
+    ///
+    /// * `f` - Formatter that receives the tab-separated lines.
+    ///
+    /// # Returns
+    ///
+    /// `Ok` when the text was written, or the formatter's error.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use degpt::mygpt::Partition;
+    ///
+    /// let partition = Partition::try_from(&[0u8; 128][..]).unwrap();
+    /// assert!(partition.to_string().starts_with("Partition:"));
+    /// ```
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
@@ -50,6 +68,21 @@ impl fmt::Display for Partition {
     }
 }
 
+/// Decode little-endian UTF-16 code units, dropping every zero unit.
+///
+/// # Arguments
+///
+/// * `buf` - Bytes holding UTF-16LE code units; an odd length panics.
+///
+/// # Returns
+///
+/// The non-zero code units in order.
+///
+/// # Examples
+///
+/// ```ignore
+/// assert_eq!(get_utf16le(&[0x65, 0, 0x66, 0, 0, 0]), vec![0x65, 0x66]);
+/// ```
 fn get_utf16le(buf: &[u8]) -> Vec<u16> {
     let mut r = vec![];
     for c in buf.chunks(2) {
@@ -64,6 +97,32 @@ fn get_utf16le(buf: &[u8]) -> Vec<u16> {
 impl TryFrom<&[u8]> for Partition {
     type Error = Box<dyn Error>;
 
+    /// Parse a 128-byte GPT partition entry.
+    ///
+    /// The type GUID, partition GUID, first and last LBA, attribute flags, and the
+    /// UTF-16LE name are read at their standard offsets. The type's `os` field is
+    /// always `OperatingSystem::None`.
+    ///
+    /// # Arguments
+    ///
+    /// * `buf` - Entry bytes; at least 128 bytes.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error when a GUID cannot be read or the name is not valid UTF-16.
+    /// A buffer shorter than 128 bytes panics.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use degpt::mygpt::Partition;
+    ///
+    /// let mut entry = [0u8; 128];
+    /// entry[56..62].copy_from_slice(&[b'e', 0, b'f', 0, b'i', 0]);
+    /// let partition = Partition::try_from(&entry[..]).unwrap();
+    /// assert_eq!(partition.name, "efi");
+    /// assert!(partition.part_guid.is_nil());
+    /// ```
     fn try_from(buf: &[u8]) -> Result<Self, Self::Error> {
         Ok(Partition {
             part_type_guid: Type {

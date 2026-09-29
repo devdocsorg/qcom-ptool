@@ -18,6 +18,15 @@ SUBCOMMANDS = {
 
 
 def _build_parser() -> argparse.ArgumentParser:
+    """Build the parser for the top-level ``qcom-ptool`` command.
+
+    Returns:
+        argparse.ArgumentParser: A parser accepting ``-V``/``--version`` and one subcommand name.
+
+    Example:
+        ``_build_parser().parse_known_args(["ptool", "-x", "partitions.xml"])`` returns the
+        ``ptool`` subcommand and ``["-x", "partitions.xml"]``.
+    """
     parser = argparse.ArgumentParser(
         prog="qcom-ptool",
         description=(
@@ -42,6 +51,18 @@ def _build_parser() -> argparse.ArgumentParser:
 
 
 def main() -> None:
+    """Run the ``qcom-ptool`` command: dispatch to the selected subcommand module.
+
+    The remaining arguments are passed to the subcommand as its ``sys.argv``, and
+    the module runs as ``__main__``, so its exit status is the command's.
+
+    Raises:
+        SystemExit: The subcommand name is invalid, ``-h`` or ``-V`` is given, or
+            the subcommand exits.
+
+    Example:
+        ``qcom-ptool gen_partition -i platforms/qcs6490-rb3gen2/ufs/partitions.conf -o partitions.xml``
+    """
     parser = _build_parser()
     args, rest = parser.parse_known_args()
 

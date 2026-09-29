@@ -6,6 +6,19 @@ import sys
 
 
 def EnsureDirectoryExists(filename):
+    """Create the directory that will hold a file, if it does not exist yet.
+
+    Args:
+        filename (str): Path of a file; its parent directory is created with any
+            missing ancestors.
+
+    Raises:
+        OSError: The directory cannot be created, for example because
+            ``filename`` has no directory part.
+
+    Example:
+        ``EnsureDirectoryExists("out/ufs/rawprogram0.xml")`` creates ``out/ufs``.
+    """
     dir = os.path.dirname(filename)
     try:
         os.stat(dir)
@@ -14,6 +27,15 @@ def EnsureDirectoryExists(filename):
 
 
 def PrintBigWarning(sz, log_func=print):
+    """Print an ASCII-art "warning" banner followed by a message.
+
+    Args:
+        sz (str): Message printed after the banner; nothing is printed when empty.
+        log_func (Callable[[str], object]): Function that writes each line; defaults to ``print``.
+
+    Example:
+        ``PrintBigWarning("Partition table is larger than the disk")``
+    """
     log_func("\t                          _             ")
     log_func("\t                         (_)            ")
     log_func("\t__      ____ _ _ __ _ __  _ _ __   __ _ ")
@@ -27,6 +49,19 @@ def PrintBigWarning(sz, log_func=print):
 
 
 def PrintBigError(sz, log_func=print):
+    """Print an ASCII-art "error" banner and, when a message is given, exit.
+
+    Args:
+        sz (str): Message printed after the banner; when non-empty the process
+            exits with status 1 after printing it.
+        log_func (Callable[[str], object]): Function that writes each line; defaults to ``print``.
+
+    Raises:
+        SystemExit: ``sz`` is not empty.
+
+    Example:
+        ``PrintBigError("Unknown partition type")`` prints the banner and exits with status 1.
+    """
     log_func("\t _________________ ___________ ")
     log_func("\t|  ___| ___ \\ ___ \\  _  | ___ \\")
     log_func("\t| |__ | |_/ / |_/ / | | | |_/ /")
@@ -39,6 +74,18 @@ def PrintBigError(sz, log_func=print):
 
 
 def reflect(data, nBits):
+    """Reverse the order of the low ``nBits`` bits of an integer.
+
+    Args:
+        data (int): Value whose bits are reflected.
+        nBits (int): Number of low-order bits to reflect.
+
+    Returns:
+        int: The reflected value.
+
+    Example:
+        ``reflect(0x01, 8)`` returns ``0x80``.
+    """
     reflection = 0x00000000
     for bit in range(nBits):
         if data & 0x01:
@@ -48,6 +95,18 @@ def reflect(data, nBits):
 
 
 def CalcCRC32(array, Len):
+    """Compute the IEEE 802.3 CRC-32 of the first bytes of an array, as used in GPT headers.
+
+    Args:
+        array (bytes | list[int]): Bytes to checksum.
+        Len (int): Number of leading bytes of ``array`` to include.
+
+    Returns:
+        int: The 32-bit CRC.
+
+    Example:
+        ``CalcCRC32(b"123456789", 9)`` returns ``0xCBF43926``.
+    """
     k = 8  # length of unit (i.e. byte)
     MSB = 0
     gx = 0x04C11DB7  # IEEE 32bit polynomial

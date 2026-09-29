@@ -1,0 +1,12 @@
+# Exact documentation-package versions; independent of the tool's own dependencies.
+Sphinx==9.1.0
+myst-parser==5.1.0
+# Static Python reference: parses the sources without importing them.
+sphinx-autoapi==3.8.1
+# Browser validation used by the shared check target.
+playwright==1.62.0
+# Shell and Rust parsers and YAML reader for the function-reference coverage check.
+tree-sitter==0.26.0
+tree-sitter-bash==0.25.1
+tree-sitter-rust==0.24.2
+pyyaml==6.0.3

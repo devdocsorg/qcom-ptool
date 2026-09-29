@@ -33,57 +33,30 @@ retain normal blkid probing. The rules use
 Run `qcom-ptool <subcommand> -h` to see the options accepted by each
 subcommand.
 
+# Branches
+
+| Branch | Purpose and status | Use | Contributions |
+| --- | --- | --- | --- |
+| `main` | Default and only branch, holding the tool and all partition layouts | Install and build from it | Accepted through the [contribution guide](docs/source/contributing/CONTRIBUTING.md) |
+
+This table lists every current branch. [BRANCHES.md](BRANCHES.md) describes branch
+maintenance.
+
+# Documentation
+
+Build the documentation site with `make -f docs/source/Makefile setup html` from
+the repository root, then open `docs/site/index.html` directly in a browser. The
+[documentation guide](docs/README.md) explains where its source lives.
+
+- [Tutorial](docs/source/user/USAGE.md) — Generate one board's partition tables and flashing files.
+- [Configuration reference](docs/source/user/CONFIGURATION.md) — Understand layout files, board files, and environment settings.
+- [Function reference](docs/source/contributing/README.md#function-reference) — Browse the documented functions of every source file.
+- [Development setup](docs/source/contributing/DEVELOPMENT.md) — Install the tools, run the checks, and build the documentation.
+
 # Development
 
-## Dependencies
-
-At runtime the tool targets Python 3.8+ and depends on two third-party
-libraries, `PyYAML` and `jsonschema`, used to load and validate the YAML
-partition source. Both are declared in `pyproject.toml` and pulled in
-automatically by `pip install .`.
-
-For development, `make lint` invokes `ruff` and `mypy` and `make unit-test`
-runs the `pytest` suite under `tests/unit/`. On Debian/Ubuntu, install
-them as follows (ruff is not packaged in apt on all releases/architectures,
-so we install it from snap):
-
-```sh
-sudo snap install ruff
-sudo apt install mypy python3-pytest
-```
-
-## Makefile targets
-
-| Target        | Description                                                |
-|---------------|------------------------------------------------------------|
-| `all`         | Generate partition XML and GPT binaries for all platforms  |
-| `lint`        | Run ruff (linter) and mypy (type checker) on the package   |
-| `unit-test`   | Run the pytest suite under `tests/unit/`                   |
-| `integration` | Build all platforms and verify generated files are present |
-| `check`       | Run `lint`, `unit-test`, and `integration`                 |
-| `install`     | Install the package (`pip install .`)                      |
-| `clean`       | Remove generated XML and binary files from platforms/      |
-
-The Makefile invokes `qcom-ptool` from `PATH`. Install the package (or
-`pip install -e .` from the repo root) before running `make all`.
-
-### Quick start
-
-```sh
-# install the tool
-pip install -e .
-
-# install linters and test runner (Debian/Ubuntu)
-sudo snap install ruff
-sudo apt install mypy python3-pytest
-
-# run linters and unit tests
-make lint
-make unit-test
-
-# build all platforms and run tests
-make check
-```
+The [development setup](docs/source/contributing/DEVELOPMENT.md) lists the
+dependencies, Makefile targets, and quick start for changing and checking the tool.
 
 ## Code contributions
 
@@ -100,3 +73,72 @@ See [CODEOWNERS](.github/CODEOWNERS).
 This project is licensed under the [BSD-3-clause
 License](https://spdx.org/licenses/BSD-3-Clause.html). See
 [LICENSE](LICENSE) for the full license text.
+
+# Repository layout
+
+## Folders
+
+- [.github/](.github/) — Holds [CODEOWNERS](.github/CODEOWNERS), the [CI workflows](.github/workflows/), the [issue](.github/ISSUE_TEMPLATE/) and [pull request](.github/PULL_REQUEST_TEMPLATE/pr_template.md) templates, and the documentation build scripts.
+- [degpt/](degpt/README.md) — Contains a Rust tool that converts GPT images back into a ptool partition XML file.
+- [docs/](docs/README.md) — Contains the documentation source and explains how to build the site.
+- [platforms/](platforms/README.md) — Holds the partition layouts and contents templates for each supported board.
+- [qcom_ptool/](qcom_ptool/README.md) — Contains the Python package behind the `qcom-ptool` command.
+- [tests/](tests/README.md) — Holds the unit tests and the integration checks for generated files.
+
+## Files
+
+- [.env.example](.env.example) — Documents the environment settings the tool and Makefile read.
+- [.gitignore](.gitignore) — Keeps generated partition files, Python caches, and the documentation build out of Git.
+- [BRANCHES.md](BRANCHES.md) — Describes the purpose and maintenance of each long-lived branch.
+- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) — States participation standards and how to report conduct concerns.
+- [CONTRIBUTING.md](CONTRIBUTING.md) — Points to the contribution guide and development setup.
+- [LICENSE](LICENSE) — Contains the project's BSD-3-Clause licence text.
+- [Makefile](Makefile) — Builds every platform's partition files and runs the lint, test, and integration checks.
+- [NOTICE.md](NOTICE.md) — Retains the notices for adapted documentation tooling and templates.
+- [README.md](README.md) — Introduces the project, its branches, documentation, and contents.
+- [SECURITY.md](SECURITY.md) — Explains how to report a vulnerability privately.
+- [pyproject.toml](pyproject.toml) — Declares the Python package, its dependencies, and the ruff, mypy, and pytest settings.
+
+<!-- repository-map:start -->
+
+## Repository map
+
+```mermaid
+flowchart LR
+    r0["qcom-ptool (you are here)"]
+    click r0 href "https://github.com/qualcomm-linux/qcom-ptool" _blank
+    r1["kernel-config"]
+    click r1 href "https://github.com/qualcomm-linux/kernel-config" _blank
+    r2["meta-qcom"]
+    click r2 href "https://github.com/qualcomm-linux/meta-qcom" _blank
+    r3["meta-qcom-3rdparty"]
+    click r3 href "https://github.com/qualcomm-linux/meta-qcom-3rdparty" _blank
+    r4["meta-qcom-arduino"]
+    click r4 href "https://github.com/qualcomm-linux/meta-qcom-arduino" _blank
+    r5["meta-qcom-distro"]
+    click r5 href "https://github.com/qualcomm-linux/meta-qcom-distro" _blank
+    r6["qcom-build-utils"]
+    click r6 href "https://github.com/qualcomm-linux/qcom-build-utils" _blank
+    r7["qcom-deb-images"]
+    click r7 href "https://github.com/qualcomm-linux/qcom-deb-images" _blank
+    r8["rpm-images"]
+    click r8 href "https://github.com/qualcomm-linux/rpm-images" _blank
+    r9["cbsp-boot-utilities"]
+    click r9 href "https://github.com/qualcomm/cbsp-boot-utilities" _blank
+    r2 -->|"gets partition tools from"| r0
+    r3 -->|"adds third-party board support to"| r2
+    r5 -->|"builds on"| r2
+    r4 -->|"builds on"| r2
+    r7 -->|"gets partition tools from"| r0
+    r8 -->|"gets partition tools from"| r0
+    r1 -->|"gets partition tools from"| r0
+    r6 -->|"runs partition tools from"| r0
+    r9 -->|"gets partition layouts from"| r0
+    style r0 fill:#e6f3ff,stroke:#0969da,stroke-width:3px,color:#182c43
+```
+
+[Full Qualcomm repository map](https://github.com/devdocsorg/qualcomm-repository-map).
+
+<!-- Generated from https://github.com/devdocsorg/qualcomm-repository-map at f01b70e66054ea4b52342c52d337d375f7902c60; dataset SHA-256: 6d96a5ee2fb28d45b5bba80c8518f8efb7e5bfe19ab8e3bd6902c43243d5fa91. -->
+
+<!-- repository-map:end -->

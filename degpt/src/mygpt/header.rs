@@ -42,6 +42,24 @@ pub struct Header {
 }
 
 impl fmt::Display for Header {
+    /// Write the disk GUID and the header and partition-table CRC32 values.
+    ///
+    /// # Arguments
+    ///
+    /// * `f` - Formatter that receives the three tab-separated lines.
+    ///
+    /// # Returns
+    ///
+    /// `Ok` when the text was written, or the formatter's error.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use degpt::mygpt::Header;
+    ///
+    /// let header = Header::try_from(&[0u8; 92][..]).unwrap();
+    /// assert!(header.to_string().starts_with("Disk:"));
+    /// ```
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
@@ -54,6 +72,29 @@ impl fmt::Display for Header {
 impl TryFrom<&[u8]> for Header {
     type Error = Box<dyn Error>;
 
+    /// Parse a GPT header from its little-endian on-disk bytes.
+    ///
+    /// # Arguments
+    ///
+    /// * `buf` - Header bytes, starting at the "EFI PART" signature; at least 92 bytes.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error when the signature is not UTF-8 or the disk GUID cannot be
+    /// read. A buffer shorter than 92 bytes panics.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use degpt::mygpt::Header;
+    ///
+    /// let mut bytes = [0u8; 92];
+    /// bytes[..8].copy_from_slice(b"EFI PART");
+    /// bytes[80..84].copy_from_slice(&128u32.to_le_bytes());
+    /// let header = Header::try_from(&bytes[..]).unwrap();
+    /// assert_eq!(header.signature, "EFI PART");
+    /// assert_eq!(header.num_parts, 128);
+    /// ```
     fn try_from(buf: &[u8]) -> Result<Self, Self::Error> {
         Ok(Header {
             signature: String::from_utf8(buf[0..8].into())?,

@@ -43,6 +43,17 @@ _BOARD = """
 
 
 def _board(tmp_path) -> str:
+    """Write the two-storage demo board to ``platforms/boards/demo.yaml`` under a temporary folder.
+
+    Args:
+        tmp_path (pathlib.Path): Per-test temporary directory from pytest.
+
+    Returns:
+        str: Path of the written board file.
+
+    Example:
+        ``board = _board(tmp_path)``
+    """
     root = tmp_path / "platforms"
     (root / "boards").mkdir(parents=True)
     path = root / "boards" / "demo.yaml"
@@ -51,6 +62,14 @@ def _board(tmp_path) -> str:
 
 
 def test_board_mode_emits_one_xml_per_storage(tmp_path):
+    """Check that ``--board`` mode writes one partition XML for each storage, in order.
+
+    Args:
+        tmp_path (pathlib.Path): Per-test temporary directory from pytest.
+
+    Example:
+        ``pytest tests/unit/test_cli_board.py::test_board_mode_emits_one_xml_per_storage``
+    """
     board = _board(tmp_path)
     nvme = tmp_path / "nvme.xml"
     spinor = tmp_path / "spinor.xml"
@@ -63,6 +82,14 @@ def test_board_mode_emits_one_xml_per_storage(tmp_path):
 
 
 def test_board_mode_output_count_mismatch_returns_1(tmp_path):
+    """Check that ``--board`` mode returns 1 when the ``-o`` count differs from the storage count.
+
+    Args:
+        tmp_path (pathlib.Path): Per-test temporary directory from pytest.
+
+    Example:
+        ``pytest tests/unit/test_cli_board.py::test_board_mode_output_count_mismatch_returns_1``
+    """
     board = _board(tmp_path)
     rc = gen_partition.main(
         ["gen_partition", "--board", board, "-o", str(tmp_path / "only.xml")]
@@ -71,6 +98,14 @@ def test_board_mode_output_count_mismatch_returns_1(tmp_path):
 
 
 def test_requires_exactly_one_source(tmp_path):
+    """Check that giving both ``-i`` and ``--board`` exits through the usage message.
+
+    Args:
+        tmp_path (pathlib.Path): Per-test temporary directory from pytest.
+
+    Example:
+        ``pytest tests/unit/test_cli_board.py::test_requires_exactly_one_source``
+    """
     board = _board(tmp_path)
     # both -i and --board -> usage() exits.
     with pytest.raises(SystemExit):
@@ -80,6 +115,14 @@ def test_requires_exactly_one_source(tmp_path):
 
 
 def test_legacy_single_storage_still_works(tmp_path):
+    """Check that a single-storage YAML file still loads through ``-i``.
+
+    Args:
+        tmp_path (pathlib.Path): Per-test temporary directory from pytest.
+
+    Example:
+        ``pytest tests/unit/test_cli_board.py::test_legacy_single_storage_still_works``
+    """
     src = tmp_path / "single.yaml"
     src.write_text(
         textwrap.dedent(
@@ -102,6 +145,15 @@ def test_legacy_single_storage_still_works(tmp_path):
 
 
 def test_show_prints_resolved_spec(tmp_path, capsys):
+    """Check that ``show`` prints every storage and partition of the resolved board.
+
+    Args:
+        tmp_path (pathlib.Path): Per-test temporary directory from pytest.
+        capsys (pytest.CaptureFixture[str]): Captures what ``show`` prints.
+
+    Example:
+        ``pytest tests/unit/test_cli_board.py::test_show_prints_resolved_spec``
+    """
     board = _board(tmp_path)
     rc = show.main(["show", "--board", board])
     assert rc == 0
@@ -112,6 +164,15 @@ def test_show_prints_resolved_spec(tmp_path, capsys):
 
 
 def test_show_applies_variants(tmp_path, capsys):
+    """Check that ``show --hlos`` applies the named HLOS variant overlay.
+
+    Args:
+        tmp_path (pathlib.Path): Per-test temporary directory from pytest.
+        capsys (pytest.CaptureFixture[str]): Captures what ``show`` prints.
+
+    Example:
+        ``pytest tests/unit/test_cli_board.py::test_show_applies_variants``
+    """
     root = tmp_path / "platforms"
     (root / "boards").mkdir(parents=True)
     (root / "variants" / "hlos").mkdir(parents=True)
@@ -135,5 +196,10 @@ def test_show_applies_variants(tmp_path, capsys):
 
 
 def test_show_requires_board():
+    """Check that ``show`` without ``--board`` exits through the usage message.
+
+    Example:
+        ``pytest tests/unit/test_cli_board.py::test_show_requires_board``
+    """
     with pytest.raises(SystemExit):
         show.main(["show"])

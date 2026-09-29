@@ -44,6 +44,18 @@ def partition_size_in_kb(size: str) -> int:
     Bare integers are interpreted as bytes and divided by 1024. Strings with a
     K/M/G suffix (any case, with optional 'B') return the kilobyte equivalent.
     Anything else raises ``ValueError``; callers may catch and reformat.
+
+    Args:
+        size (str): Size in bytes, or with a ``K``, ``M``, or ``G`` suffix.
+
+    Returns:
+        int: The size in kilobytes.
+
+    Raises:
+        ValueError: The size string is not in a recognised format.
+
+    Example:
+        ``partition_size_in_kb("2MB")`` returns ``2048``; ``partition_size_in_kb("4096")`` returns ``4``.
     """
     if not re.search("[a-zA-Z]+", size):
         return int(size) // 1024
@@ -65,7 +77,18 @@ def partition_size_in_kb(size: str) -> int:
 
 
 def disk_options(argv: list[tuple[str, str]]) -> DiskParams:
-    """Translate parsed ``--disk`` options into the canonical disk dict."""
+    """Translate parsed ``--disk`` options into the canonical disk dict.
+
+    Args:
+        argv (list[tuple[str, str]]): ``(option, value)`` pairs from ``getopt``.
+
+    Returns:
+        DiskParams: A copy of ``DISK_PARAMS_DEFAULTS`` with the given options applied.
+
+    Example:
+        ``disk_options([("--type", "ufs"), ("--grow-last-partition", "")])["GROW_LAST_PARTITION_TO_FILL_DISK"]``
+        returns ``"true"``.
+    """
     disk = DISK_PARAMS_DEFAULTS.copy()
     for opt, arg in argv:
         if opt == "--type":
@@ -85,6 +108,17 @@ def disk_options(argv: list[tuple[str, str]]) -> DiskParams:
 
 
 def to_bool(arg: str) -> str:
+    """Normalise a ``.conf`` boolean value to ``"true"`` or ``"false"``.
+
+    Args:
+        arg (str): Option value; ``1``, ``y``, ``yes``, and ``true`` (any case) are true.
+
+    Returns:
+        str: ``"true"`` or ``"false"``.
+
+    Example:
+        ``to_bool("Yes")`` returns ``"true"``; ``to_bool("0")`` returns ``"false"``.
+    """
     return "true" if arg.strip().lower() in ("1", "y", "yes", "true") else "false"
 
 
@@ -97,6 +131,19 @@ def partition_options(
     ``image_map`` (if provided) overrides the entry's ``filename`` when the
     partition name matches a key. The override is applied after all options
     have been processed, so it always wins over an explicit ``--filename``.
+
+    Args:
+        argv (list[tuple[str, str]]): ``(option, value)`` pairs from ``getopt``.
+        image_map (Mapping[str, str] | None): Partition names mapped to replacement file names.
+
+    Returns:
+        tuple[str, PartitionEntry]: The LUN (``"0"`` when not given) and the partition entry.
+
+    Raises:
+        ValueError: A size, attribute, or numeric value cannot be parsed.
+
+    Example:
+        ``partition_options([("--lun", "1"), ("--name", "xbl_a"), ("--size", "3604KB")])[0]`` returns ``"1"``.
     """
     if image_map is None:
         image_map = {}
@@ -177,7 +224,20 @@ _PARTITION_LONG_OPTS = [
 
 
 def parse_disk_line(line: str) -> DiskParams | None:
-    """Parse a single ``--disk ...`` line; return None if the line isn't one."""
+    """Parse a single ``--disk ...`` line; return None if the line isn't one.
+
+    Args:
+        line (str): A layout line with space-separated options.
+
+    Returns:
+        DiskParams | None: The disk parameters, or None when the line does not start with ``--disk``.
+
+    Raises:
+        getopt.GetoptError: The line has an unknown option or a missing value.
+
+    Example:
+        ``parse_disk_line("--disk --type=emmc --size=4096")["type"]`` returns ``"emmc"``.
+    """
     opts_list = line.split(" ")
     if not opts_list or opts_list[0] != "--disk":
         return None
@@ -189,7 +249,21 @@ def parse_partition_lines(
     lines: list[str],
     image_map: Mapping[str, str] | None = None,
 ) -> PartitionsByLun:
-    """Parse a list of ``--partition ...`` lines, grouped by LUN/phys-part."""
+    """Parse a list of ``--partition ...`` lines, grouped by LUN/phys-part.
+
+    Args:
+        lines (list[str]): Layout lines; lines not starting with ``--partition`` are skipped.
+        image_map (Mapping[str, str] | None): Partition names mapped to replacement file names.
+
+    Returns:
+        PartitionsByLun: Partition entries grouped by LUN, in file order.
+
+    Raises:
+        getopt.GetoptError: A line has an unknown option or a missing value.
+
+    Example:
+        ``list(parse_partition_lines(["--partition --lun=0 --name=efi --size=512KB"]))`` returns ``["0"]``.
+    """
     if image_map is None:
         image_map = {}
     partitions: PartitionsByLun = {}
@@ -214,6 +288,20 @@ def read_conf(path: str) -> tuple[str, list[str]]:
     Comments (``#``-prefixed) and blank lines are skipped. Multiple ``--disk``
     lines are an error. Lines that aren't ``--disk`` or ``--partition`` are
     printed as "Ignoring ..." for parity with the original behaviour.
+
+    Args:
+        path (str): ``.conf`` layout file.
+
+    Returns:
+        tuple[str, list[str]]: The ``--disk`` line and the ``--partition`` lines, stripped.
+
+    Raises:
+        ConfParseError: The file has no ``--disk`` line or more than one.
+        OSError: The file cannot be read.
+
+    Example:
+        ``read_conf("platforms/qcs6490-rb3gen2/ufs/partitions.conf")[0]`` returns the line
+        starting ``--disk --type=ufs``.
     """
     disk_line: str | None = None
     partition_lines: list[str] = []
@@ -239,7 +327,21 @@ def read_conf(path: str) -> tuple[str, list[str]]:
 
 
 def load(path: str, image_map: Mapping[str, str] | None = None) -> LoadedSpec:
-    """Public entry point: read ``path`` and return a normalised ``LoadedSpec``."""
+    """Public entry point: read ``path`` and return a normalised ``LoadedSpec``.
+
+    Args:
+        path (str): ``.conf`` layout file.
+        image_map (Mapping[str, str] | None): Partition names mapped to replacement file names.
+
+    Returns:
+        LoadedSpec: The layout's disk parameters and partitions grouped by LUN.
+
+    Raises:
+        ConfParseError: The ``--disk`` line is missing, repeated, or cannot be parsed.
+
+    Example:
+        ``load("platforms/qcs6490-rb3gen2/ufs/partitions.conf")["disk"]["type"]`` returns ``"ufs"``.
+    """
     disk_line, partition_lines = read_conf(path)
     disk = parse_disk_line(disk_line)
     if disk is None:
