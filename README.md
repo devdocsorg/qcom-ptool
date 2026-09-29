@@ -98,3 +98,47 @@ License](https://spdx.org/licenses/BSD-3-Clause.html). See
 - [README.md](README.md) — Introduces the project, its branches, documentation, and contents.
 - [SECURITY.md](SECURITY.md) — Explains how to report a vulnerability privately.
 - [pyproject.toml](pyproject.toml) — Declares the Python package, its dependencies, and the ruff, mypy, and pytest settings.
+
+<!-- repository-map:start -->
+
+## Repository map
+
+```mermaid
+flowchart LR
+    r0["qcom-ptool (you are here)"]
+    click r0 href "https://github.com/qualcomm-linux/qcom-ptool" _blank
+    r1["kernel-config"]
+    click r1 href "https://github.com/qualcomm-linux/kernel-config" _blank
+    r2["meta-qcom"]
+    click r2 href "https://github.com/qualcomm-linux/meta-qcom" _blank
+    r3["meta-qcom-3rdparty"]
+    click r3 href "https://github.com/qualcomm-linux/meta-qcom-3rdparty" _blank
+    r4["meta-qcom-arduino"]
+    click r4 href "https://github.com/qualcomm-linux/meta-qcom-arduino" _blank
+    r5["meta-qcom-distro"]
+    click r5 href "https://github.com/qualcomm-linux/meta-qcom-distro" _blank
+    r6["qcom-build-utils"]
+    click r6 href "https://github.com/qualcomm-linux/qcom-build-utils" _blank
+    r7["qcom-deb-images"]
+    click r7 href "https://github.com/qualcomm-linux/qcom-deb-images" _blank
+    r8["rpm-images"]
+    click r8 href "https://github.com/qualcomm-linux/rpm-images" _blank
+    r9["cbsp-boot-utilities"]
+    click r9 href "https://github.com/qualcomm/cbsp-boot-utilities" _blank
+    r2 -->|"gets partition tools from"| r0
+    r3 -->|"adds third-party board support to"| r2
+    r5 -->|"builds on"| r2
+    r4 -->|"builds on"| r2
+    r7 -->|"gets partition tools from"| r0
+    r8 -->|"gets partition tools from"| r0
+    r1 -->|"gets partition tools from"| r0
+    r6 -->|"runs partition tools from"| r0
+    r9 -->|"gets partition layouts from"| r0
+    style r0 fill:#e6f3ff,stroke:#0969da,stroke-width:3px,color:#182c43
+```
+
+[Full Qualcomm repository map](https://github.com/devdocsorg/qualcomm-repository-map).
+
+<!-- Generated from https://github.com/devdocsorg/qualcomm-repository-map at f01b70e66054ea4b52342c52d337d375f7902c60; dataset SHA-256: 6d96a5ee2fb28d45b5bba80c8518f8efb7e5bfe19ab8e3bd6902c43243d5fa91. -->
+
+<!-- repository-map:end -->
