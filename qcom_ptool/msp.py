@@ -64,6 +64,13 @@ disk_size = None
 
 
 def reset_device_log():
+    """Create an empty log_msp.txt in the current directory.
+
+    Exits the program if the log file cannot be created.
+
+    Example:
+        ``reset_device_log()`` truncates ``log_msp.txt`` before a run.
+    """
     try:
         log_fp = open("log_msp.txt", "w")
     except Exception as x:
@@ -78,6 +85,19 @@ def reset_device_log():
 
 
 def device_log(message, display=1):
+    """Append a timestamped message to log_msp.txt and optionally print it.
+
+    If the log file cannot be opened or written, an error is printed and the
+    message is not logged.
+
+    Args:
+        message (object): Text to log; it is formatted with ``%s``.
+        display (int): 1 also prints the message to standard output; any other
+            value only writes it to the log.
+
+    Example:
+        ``device_log("Opened rawprogram0.xml", 0)`` logs without printing.
+    """
     try:
         log_fp = open("log_msp.txt", "a")
     except Exception as x:
@@ -99,6 +119,21 @@ def device_log(message, display=1):
 
 
 def ReadSectors(opfile, NumSectors):
+    """Read whole sectors from an open file.
+
+    Args:
+        opfile (typing.BinaryIO): File or device opened for binary reading.
+        NumSectors (int): Number of SECTOR_SIZE sectors to read.
+
+    Returns:
+        bytes: The data read; shorter at the end of the file.
+
+    Raises:
+        SystemExit: The read fails; the error is logged first.
+
+    Example:
+        ``ReadSectors(open("singleimage.bin", "rb"), 34)`` returns up to 34 sectors.
+    """
     try:
         return opfile.read(NumSectors * SECTOR_SIZE)
     except Exception as x:
@@ -111,14 +146,47 @@ device_log("\nmsp.py is running from CWD: %s\n" % os.getcwd())
 
 
 def PrintBigWarning(sz):
+    """Log a highlighted warning banner followed by the warning text.
+
+    Args:
+        sz (str): Warning text logged after the banner; empty logs only the banner.
+
+    Example:
+        ``PrintBigWarning("Only the first 512 bytes will be written")``
+    """
     _PrintBigWarning(sz, log_func=device_log)
 
 
 def PrintBigError(sz):
+    """Log a highlighted error banner and, when given a message, exit.
+
+    Delegates to ``qcom_ptool.utils.PrintBigError`` with ``device_log`` as the
+    logger. An empty message logs only the banner and returns.
+
+    Args:
+        sz (str): Error text logged after the banner.
+
+    Raises:
+        SystemExit: ``sz`` is not empty; the exit status is 1.
+
+    Example:
+        ``PrintBigError("Could not open rawprogram0.xml")``
+    """
     _PrintBigError(sz, log_func=device_log)
 
 
 def PrettyPrintArray(bytes_read):
+    """Print a hex and character dump of whole sectors.
+
+    Each sector is printed as 32 rows of 16 bytes; bytes beyond the last whole
+    sector are not printed.
+
+    Args:
+        bytes_read (bytes): Data whose length is a multiple of SECTOR_SIZE.
+
+    Example:
+        ``PrettyPrintArray(bytes(512))`` prints one zero-filled sector.
+    """
     Bytes = struct.unpack("%dB" % len(bytes_read), bytes_read)
 
     for _k in range(len(Bytes) // SECTOR_SIZE):
@@ -136,6 +204,25 @@ def PrettyPrintArray(bytes_read):
 
 
 def external_call(command, capture_output=True):
+    """Run an external command and return its standard output.
+
+    On Linux the command runs through the shell. With ``capture_output`` False
+    the command runs through ``os.system`` and nothing is captured. Standard error
+    is logged when present.
+
+    Args:
+        command (str): Command line to run.
+        capture_output (bool): True captures output with ``subprocess.Popen``.
+
+    Returns:
+        bytes: The captured standard output, or None when output is not captured.
+
+    Raises:
+        SystemExit: The command could not be started.
+
+    Example:
+        ``external_call("cat /proc/partitions")`` returns the partition list.
+    """
     errors = None
     output = None
     try:
@@ -162,6 +249,26 @@ def external_call(command, capture_output=True):
 
 
 def HandleNUM_DISK_SECTORS(field):
+    """Resolve a sector field that may use the NUM_DISK_SECTORS keyword.
+
+    ``NUM_DISK_SECTORS-N`` becomes the disk size in sectors minus N when the disk
+    size is known; otherwise it becomes a large placeholder (the 64 TB maximum
+    plus N) that ``ReplaceDiskSizeInSectorsWithRealValue`` resolves later.
+    Other strings are converted with ``int``; non-string values are returned
+    unchanged.
+
+    Args:
+        field (str | int): Field value from a rawprogram or patch XML attribute.
+
+    Returns:
+        int: The sector value, or the input unchanged when it is not a string.
+
+    Raises:
+        ValueError: A string field is neither a keyword expression nor an integer.
+
+    Example:
+        ``HandleNUM_DISK_SECTORS("NUM_DISK_SECTORS-33")`` returns the disk size in sectors minus 33.
+    """
     if not isinstance(field, str):
         # print "returning since this is not a string"
         return field
@@ -193,6 +300,22 @@ def HandleNUM_DISK_SECTORS(field):
 
 
 def ReturnParsedValues(element):
+    """Convert a program, read, or patch XML element into a settings dictionary.
+
+    Missing attributes take defaults, legacy ``num_sectors`` and ``offset`` names
+    are mapped to their current names, NUM_DISK_SECTORS expressions are resolved,
+    and a ``CRC32(start,length)`` value becomes a CRC32 patch function. Sets the
+    global SECTOR_SIZE from ``SECTOR_SIZE_IN_BYTES``.
+
+    Args:
+        element (xml.etree.ElementTree.Element): Element read from the XML file.
+
+    Returns:
+        dict: The element's attributes with numeric fields converted.
+
+    Example:
+        ``ReturnParsedValues(ET.fromstring('<read filename="dump0.bin" start_sector="0" num_partition_sectors="34"/>'))``
+    """
     global SECTOR_SIZE
     MyDict = {
         "filename": "",
@@ -265,6 +388,19 @@ def ReturnParsedValues(element):
 
 
 def ParseXML(xml_filename):  ## this function updates all the global arrays
+    """Load read, program, and patch instructions from an XML file.
+
+    Appends each element to the global ReadArray, WriteArray, or PatchArray.
+
+    Args:
+        xml_filename (str): Path of a rawprogram or patch XML file.
+
+    Raises:
+        SystemExit: A read, program, or patch element has no attributes.
+
+    Example:
+        ``ParseXML("rawprogram0.xml")``
+    """
     global WriteArray, PatchArray, ReadArray, MinDiskSizeInSectors
 
     root = ET.parse(xml_filename)
@@ -306,6 +442,17 @@ def ParseXML(xml_filename):  ## this function updates all the global arrays
 
 
 def ReturnArrayFromCommaSeparatedList(sz):
+    """Split a comma-separated list after collapsing whitespace.
+
+    Args:
+        sz (str): Comma-separated text, such as a ``-f`` or ``-s`` option value.
+
+    Returns:
+        list[str]: The items between commas; spaces next to commas are kept.
+
+    Example:
+        ``ReturnArrayFromCommaSeparatedList("sbl1.mbn,tz.mbn")`` returns ``["sbl1.mbn", "tz.mbn"]``.
+    """
     temp = re.sub(r"\s+|\n", " ", sz)
     temp = re.sub(r"^\s+", "", temp)
     temp = re.sub(r"\s+$", "", temp)
@@ -313,6 +460,18 @@ def ReturnArrayFromCommaSeparatedList(sz):
 
 
 def find_file(filename, search_paths):
+    """Find a file in the search paths, then in the current directory.
+
+    Args:
+        filename (str): File name to look for.
+        search_paths (list[str]): Folders searched in order before the current directory.
+
+    Returns:
+        str: Path of the first match, or None when the file is not found.
+
+    Example:
+        ``find_file("xbl.elf", ["images"])`` returns ``"images/xbl.elf"`` when it exists.
+    """
     device_log("\n\n\tLooking for '%s'" % filename)
     device_log("\t" + "-" * 40)
     for x in search_paths:
@@ -336,6 +495,15 @@ def find_file(filename, search_paths):
 
 
 def DoubleCheckDiskSize():
+    """Warn when Windows reports a smaller disk size than can be read.
+
+    Does nothing for singleimage.bin output, with ``-n`` (no prompts), or on
+    platforms other than Windows. On Windows it reads past the reported size
+    and logs the difference.
+
+    Example:
+        ``DoubleCheckDiskSize()``
+    """
 
     if os.path.basename(Filename) == "singleimage.bin":
         return
@@ -393,6 +561,19 @@ def DoubleCheckDiskSize():
 
 
 def PerformRead():
+    """Read disk sectors into files for every read instruction.
+
+    Uses the global ReadArray, destination Filename, and prompt settings. Entries
+    without a filename or sector count are skipped; with ``-i`` each read is
+    confirmed first.
+
+    Raises:
+        SystemExit: The destination cannot be opened or is too small, an output
+            file cannot be written, or the user quits.
+
+    Example:
+        ``PerformRead()`` after ``ParseXML("rawprogram0.xml")`` saves each read to its filename.
+    """
     global ReadArray, search_paths, interactive, Filename
 
     device_log("\t                    _ _             ")
@@ -555,6 +736,23 @@ def PerformRead():
 
 
 def PerformWrite():
+    """Write every selected image file to its start sector on the destination.
+
+    Uses the global WriteSorted list, destination Filename, search paths, and
+    prompt settings. Missing files are requested interactively unless ``-n`` is
+    set; files larger than MAX_FILE_SIZE_BEFORE_SPLIT are written in chunks, and
+    images larger than their partition are truncated with a warning.
+
+    Returns:
+        int: 1 when an image was truncated to fit its partition, otherwise 0.
+
+    Raises:
+        SystemExit: A file or the destination cannot be opened, read, or written,
+            the destination is too small, or the user quits.
+
+    Example:
+        ``PerformWrite()`` with ``Filename`` set to ``singleimage.bin`` builds an image file.
+    """
     global WriteSorted, LoadSubsetOfFiles, search_paths, interactive, Filename
 
     ThereWereWarnings = 0
@@ -1088,6 +1286,15 @@ def PerformWrite():
 
 
 def GetPartitions():
+    """Detect disks and store their sizes in the global AvailablePartitions.
+
+    On Linux it reads /proc/partitions (through temp_partitions.txt in the
+    current directory) for ``sdX`` disks; elsewhere it queries ``wmic``. The
+    detected disks are logged, with a caution for disks over 31 GB.
+
+    Example:
+        ``GetPartitions()`` records ``/dev/sdX`` sizes in bytes.
+    """
     global Devices, AvailablePartitions
     if sys.platform.startswith("linux"):
         # device_log("This is a linux system since sys.platform='%s'" % sys.platform)
@@ -1181,6 +1388,20 @@ def GetPartitions():
 
 
 def PerformPatching():
+    """Apply patch instructions to files or to the disk.
+
+    Uses the global PatchArray. When the global Patching is ``"DISK"`` only entries
+    whose filename is DISK are applied, after confirmation unless ``-n`` is set;
+    otherwise only file entries are applied. CRC32 values are computed from the
+    target before writing, and on Linux ``sync`` runs after each patch.
+
+    Raises:
+        SystemExit: The user declines or quits, a file cannot be found with ``-n``,
+            or a read, write, or seek fails.
+
+    Example:
+        ``PerformPatching()`` after ``ParseXML("patch0.xml")`` patches the listed files.
+    """
     global PatchArray, Patching
 
     device_log("\t             _        _     _             ")
@@ -1555,6 +1776,11 @@ def PerformPatching():
 
 
 def Usage():
+    """Print the command-line usage examples.
+
+    Example:
+        ``Usage()``
+    """
     print("Usage: Mass Storage Programmer - destructively writes data to disks!!\n")
 
     sudo = ""
@@ -1626,6 +1852,17 @@ def Usage():
 
 
 def ReturnSizeString(size):
+    """Format a byte count as a short human-readable size.
+
+    Args:
+        size (int | float): Size in bytes.
+
+    Returns:
+        str: The size in GB, MB, or KB with two decimals, or in bytes.
+
+    Example:
+        ``ReturnSizeString(2048)`` returns ``"2.00 KB"``.
+    """
     if size > (1024 * 1024 * 1024):
         return "%.2f GB" % (size / (1024.0 * 1024.0 * 1024.0))
     elif size > (1024 * 1024):
@@ -1640,6 +1877,11 @@ def ReturnSizeString(size):
 
 
 def PrintResetDeviceNow():
+    """Log a banner asking the user to reset the device.
+
+    Example:
+        ``PrintResetDeviceNow()``
+    """
     device_log("\t______              _                            ")
     device_log("\t| ___ \\            | |                           ")
     device_log("\t| |_/ /___ ___  ___| |_   _   _  ___  _   _ _ __ ")
@@ -1658,6 +1900,21 @@ def PrintResetDeviceNow():
 
 
 def TestIfSparse(test_sparse, filetotest):
+    """Check an image with a sparse-file test script before it is written.
+
+    Logs a warning when no test script is available. Otherwise runs the script
+    with the current search paths and stops when it reports a sparse file.
+
+    Args:
+        test_sparse (str): Path of the sparse-test script, or None when not found.
+        filetotest (str): Image file to check.
+
+    Raises:
+        SystemExit: The script reports a sparse file.
+
+    Example:
+        ``TestIfSparse(None, "rootfs.img")`` logs that the test script is missing.
+    """
     if test_sparse is None:
         PrintBigWarning(
             "WARNING: testsparse.py is not found - Can't test if this file is SPARSE\n"
@@ -1698,6 +1955,19 @@ def TestIfSparse(test_sparse, filetotest):
 
 
 def ReplaceDiskSizeInSectorsWithRealValue(MyArray):
+    """Replace NUM_DISK_SECTORS placeholders once the disk size is known.
+
+    Values above the 64 TB placeholder base, written by
+    ``HandleNUM_DISK_SECTORS``, become offsets from the end of the disk in
+    start_sector, num_partition_sectors, file_sector_offset, and value. Entries
+    are updated in place.
+
+    Args:
+        MyArray (list[dict]): Parsed instructions from ``ReturnParsedValues``.
+
+    Example:
+        ``ReplaceDiskSizeInSectorsWithRealValue(PatchArray)``
+    """
     ## At this point I have the real size of DiskSizeInBytes, so let's fill in the blanks if they still exist
     for MyDict in MyArray:
         if int(MyDict["start_sector"]) > 0 and int(MyDict["start_sector"]) > (
@@ -1730,6 +2000,18 @@ def ReplaceDiskSizeInSectorsWithRealValue(MyArray):
 
 
 def CalculateMinDiskSize():
+    """Return the smallest disk size, in sectors, that fits the write instructions.
+
+    Uses the global WriteSorted list: the end of the last partition with a real
+    start sector, plus the space needed by entries placed relative to the end of
+    the disk.
+
+    Returns:
+        int | float: The minimum disk size in sectors.
+
+    Example:
+        ``CalculateMinDiskSize()`` returns the sector count needed by rawprogram0.xml.
+    """
     OldMinDiskSizeInSectors = 0
     MinDiskSizeInSectors = 0
     # Calculate the MinDiskSizeInSectors. This is a 2 step process

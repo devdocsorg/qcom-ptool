@@ -21,7 +21,19 @@ DEFAULT_LAYOUT_GLOB = "platforms/*/*/partitions.conf"
 
 
 def load_filesystem_names() -> set[str]:
-    """Load names of partitions that may contain filesystems."""
+    """Load names of partitions that may contain filesystems.
+
+    The names come from ``data/filesystem-partition-names.list``; ``#`` starts a comment.
+
+    Returns:
+        set[str]: The listed partition names.
+
+    Raises:
+        ValueError: A name is invalid or duplicated, or the list is empty.
+
+    Example:
+        ``"rootfs" in load_filesystem_names()`` returns ``True``.
+    """
     names: set[str] = set()
     for line_number, line in enumerate(
         FILESYSTEM_NAMES_FILE.read_text(encoding="utf-8").splitlines(), start=1
@@ -45,7 +57,20 @@ def load_filesystem_names() -> set[str]:
 
 
 def load_partition_names(inputs: list[Path]) -> set[str]:
-    """Load and merge partition names from all supplied layouts."""
+    """Load and merge partition names from all supplied layouts.
+
+    Args:
+        inputs (list[Path]): Partition layout files (``.conf`` or YAML).
+
+    Returns:
+        set[str]: Every partition label except empty labels and ``last_parti``.
+
+    Raises:
+        ValueError: A layout cannot be loaded or holds an invalid partition name.
+
+    Example:
+        ``load_partition_names([Path("platforms/qcs6490-rb3gen2/ufs/partitions.conf")])``
+    """
     names: set[str] = set()
     for path in inputs:
         spec = load_spec(str(path))
@@ -60,12 +85,37 @@ def load_partition_names(inputs: list[Path]) -> set[str]:
 
 
 def load_raw_partition_names(inputs: list[Path]) -> list[str]:
-    """Return known raw partition names from the supplied layouts."""
+    """Return known raw partition names from the supplied layouts.
+
+    Args:
+        inputs (list[Path]): Partition layout files.
+
+    Returns:
+        list[str]: Sorted partition names that are not on the filesystem name list.
+
+    Example:
+        ``"xbl_a" in load_raw_partition_names([Path("platforms/qcs6490-rb3gen2/ufs/partitions.conf")])``
+        returns ``True``.
+    """
     return sorted(load_partition_names(inputs) - load_filesystem_names())
 
 
 def discover_inputs(inputs: list[Path] | None) -> list[Path]:
-    """Use explicit layouts or discover all layouts in the current repo."""
+    """Use explicit layouts or discover all layouts in the current repo.
+
+    Args:
+        inputs (list[Path] | None): Layouts named on the command line, or None.
+
+    Returns:
+        list[Path]: ``inputs`` when given, otherwise every
+        ``platforms/*/*/partitions.conf`` under the current directory, sorted.
+
+    Raises:
+        ValueError: No layouts were given and none were found.
+
+    Example:
+        ``discover_inputs(None)`` run from the repository root lists every in-tree ``partitions.conf``.
+    """
     if inputs:
         return inputs
 
@@ -79,7 +129,20 @@ def discover_inputs(inputs: list[Path] | None) -> list[Path]:
 
 
 def render_rules(names: list[str]) -> str:
-    """Render the udev rules template for the supplied partition names."""
+    """Render the udev rules template for the supplied partition names.
+
+    Args:
+        names (list[str]): Raw partition names; each gets a ``PARTNAME`` match rule.
+
+    Returns:
+        str: The rules file text.
+
+    Raises:
+        ValueError: The template does not contain exactly one placeholder.
+
+    Example:
+        ``render_rules(["xbl_a"])`` contains ``ENV{PARTNAME}=="xbl_a", GOTO="qcom_raw_noblkid"``.
+    """
     rules = "\n".join(
         f'ENV{{PARTNAME}}=="{name}", GOTO="qcom_raw_noblkid"'
         for name in names
@@ -91,11 +154,38 @@ def render_rules(names: list[str]) -> str:
 
 
 def generate_rules(inputs: list[Path] | None = None) -> str:
-    """Render rules for raw partitions in all supplied layouts."""
+    """Render rules for raw partitions in all supplied layouts.
+
+    Args:
+        inputs (list[Path] | None): Layout files, or None to scan the in-tree layouts.
+
+    Returns:
+        str: The rules file text.
+
+    Raises:
+        ValueError: Layouts or the filesystem name list are missing or invalid.
+
+    Example:
+        ``generate_rules()`` run from the repository root returns the rules for every in-tree layout.
+    """
     return render_rules(load_raw_partition_names(discover_inputs(inputs)))
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    """Parse the ``gen_udev_rules`` command-line options.
+
+    Args:
+        argv (list[str] | None): Arguments without the program name; ``sys.argv[1:]`` when None.
+
+    Returns:
+        argparse.Namespace: ``input`` (list of paths or None) and ``output`` (path).
+
+    Raises:
+        SystemExit: The options are invalid or ``-h`` is given.
+
+    Example:
+        ``parse_args(["-o", "55-qcom-raw-partitions-noblkid.rules"]).input`` returns ``None``.
+    """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "-i",
@@ -109,6 +199,18 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Run ``gen_udev_rules``: write the raw-partition udev rules file.
+
+    Args:
+        argv (list[str] | None): Arguments without the program name; ``sys.argv[1:]`` when None.
+
+    Returns:
+        int: 0 when the rules are written, 2 when a layout, the data files, or the
+        output cannot be read or written.
+
+    Example:
+        ``main(["-o", "55-qcom-raw-partitions-noblkid.rules"])`` returns ``0`` from the repository root.
+    """
     args = parse_args(argv)
     try:
         content = generate_rules(args.input)

@@ -39,6 +39,14 @@ from qcom_ptool.spec import DiskParams, PartitionsByLun
 
 
 def usage() -> NoReturn:
+    """Print the ``gen_partition`` command-line usage and exit with status 1.
+
+    Raises:
+        SystemExit: Always.
+
+    Example:
+        ``qcom-ptool gen_partition -h`` prints this usage.
+    """
     print(
         "\n\tUsage:\n"
         "\t  %s -i <input> -o <output> "
@@ -57,6 +65,20 @@ def usage() -> NoReturn:
 def generate_multi_lun_xml(
     disk_params: DiskParams, partitions: PartitionsByLun, output_xml: str
 ) -> None:
+    """Write a partitions.xml file for ptool from disk parameters and partitions.
+
+    Disk parameters other than ``size`` and ``type`` become ``KEY=value`` lines in
+    ``parser_instructions``; each LUN (physical partition) with at least one entry
+    becomes a ``physical_partition`` element, in ascending LUN order.
+
+    Args:
+        disk_params (DiskParams): Normalised disk parameters from a loader.
+        partitions (PartitionsByLun): Partition entries grouped by LUN.
+        output_xml (str): Path of the XML file to write.
+
+    Example:
+        ``generate_multi_lun_xml(spec["disk"], spec["partitions"], "partitions.xml")``
+    """
     root = ET.Element("configuration")
     parser_instruction_text = ""
 
@@ -85,6 +107,19 @@ def generate_multi_lun_xml(
 def generate_partition_xml(
     disk_params: DiskParams, partitions: PartitionsByLun, output_xml: str
 ) -> None:
+    """Write partitions.xml for a supported storage type, or report an unsupported one.
+
+    eMMC, NVMe, SPI-NOR, and UFS layouts are written with
+    ``generate_multi_lun_xml``; any other type prints a message and writes nothing.
+
+    Args:
+        disk_params (DiskParams): Normalised disk parameters, including ``type``.
+        partitions (PartitionsByLun): Partition entries grouped by LUN.
+        output_xml (str): Path of the XML file to write.
+
+    Example:
+        ``generate_partition_xml(spec["disk"], spec["partitions"], "partitions.xml")``
+    """
     print("Generating %s XML %s" % (disk_params["type"].upper(), output_xml))
 
     if disk_params["type"] in ("emmc", "nvme", "spinor", "ufs"):
@@ -101,6 +136,27 @@ def generate_partition_xml(
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Run ``gen_partition``: convert a partition layout or a board file into partitions.xml.
+
+    With ``-i`` a single ``.conf`` or YAML layout is written to the one ``-o``
+    output. With ``--board`` every storage of the resolved board is written to
+    ``<outdir>/<storage-id>/partitions.xml`` or to one ``-o`` per storage.
+    ``-m name=file,...`` overrides partition file names.
+
+    Args:
+        argv (list[str] | None): Command line including the program name; ``sys.argv`` when None.
+
+    Returns:
+        int: 0 on success, 1 when the layout or board cannot be loaded or the
+        outputs do not match the storages.
+
+    Raises:
+        SystemExit: The options are invalid or ``-h`` is given; usage is printed.
+
+    Example:
+        ``main(["gen_partition", "-i", "platforms/qcs6490-rb3gen2/ufs/partitions.conf", "-o", "partitions.xml"])``
+        returns ``0``.
+    """
     if argv is None:
         argv = sys.argv
 
@@ -180,6 +236,26 @@ def _run_board(
     outdir: str | None,
     image_map: dict[str, str],
 ) -> int:
+    """Resolve a board file and write one partitions.xml per storage.
+
+    Args:
+        board_file (str): Board YAML file.
+        root (str | None): Platforms directory for ``extends`` and ``includes``, or None to derive it.
+        hlos (str | None): ``hlos`` variant overlay name, or None.
+        boot_fw (str | None): ``boot-fw`` variant overlay name, or None.
+        outputs (list[str]): Explicit output paths, one per storage in board order;
+            empty to write under ``outdir``.
+        outdir (str | None): Directory for ``<storage-id>/partitions.xml`` outputs; ``.`` when None.
+        image_map (dict[str, str]): Partition names mapped to replacement file names.
+
+    Returns:
+        int: 0 on success, 1 when the board cannot be resolved or the number of
+        outputs differs from the number of storages.
+
+    Example:
+        ``_run_board("platforms/boards/glymur-crd.yaml", None, None, None, [], "platforms/glymur-crd", {})``
+        writes ``platforms/glymur-crd/nvme/partitions.xml`` and ``platforms/glymur-crd/spinor/partitions.xml``.
+    """
     # Late import so the -i path never pulls in PyYAML / jsonschema.
     from qcom_ptool.board import board_to_specs, resolve_board
 

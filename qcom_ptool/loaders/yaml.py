@@ -46,14 +46,31 @@ class YamlParseError(ValueError):
 def _bool_str(value: Any) -> str:
     """Render a YAML scalar as the lowercase "true"/"false" the .conf loader
     stores. ``str(True)`` would yield "True", which the emitter would then
-    write verbatim and break parity, so booleans are normalised explicitly."""
+    write verbatim and break parity, so booleans are normalised explicitly.
+
+    Args:
+        value (Any): A YAML scalar.
+
+    Returns:
+        str: ``"true"`` or ``"false"`` for booleans, otherwise ``str(value)``.
+
+    Example:
+        ``_bool_str(True)`` returns ``"true"``; ``_bool_str(3)`` returns ``"3"``.
+    """
     if isinstance(value, bool):
         return "true" if value else "false"
     return str(value)
 
 
 def load_schema() -> dict[str, Any]:
-    """Return the packaged partition JSON Schema as a dict."""
+    """Return the packaged partition JSON Schema as a dict.
+
+    Returns:
+        dict[str, Any]: The parsed ``partitions.schema.json``.
+
+    Example:
+        ``load_schema()["title"]`` returns ``"qcom-ptool single-storage partition spec"``.
+    """
     text = resources.files(_SCHEMA_PACKAGE).joinpath(_SCHEMA_RESOURCE).read_text(
         encoding="utf-8"
     )
@@ -67,6 +84,15 @@ def _disk_from_node(node: Mapping[str, Any]) -> DiskParams:
     Starts from ``DISK_PARAMS_DEFAULTS`` and overrides only the keys present,
     exactly like ``conf.disk_options``, so unset fields keep their defaults and
     the key order is identical.
+
+    Args:
+        node (Mapping[str, Any]): A validated ``disk`` mapping, or a resolved board storage.
+
+    Returns:
+        DiskParams: A copy of ``DISK_PARAMS_DEFAULTS`` with the node's fields applied.
+
+    Example:
+        ``_disk_from_node({"type": "ufs", "size": 4096})["size"]`` returns ``"4096"``.
     """
     disk = DISK_PARAMS_DEFAULTS.copy()
     disk["type"] = str(node["type"])
@@ -91,6 +117,18 @@ def _partition_from_node(
 
     Mirrors ``conf.partition_options``: same defaults, same attribute-bit
     decoding, and the image-map override applied last so it always wins.
+
+    Args:
+        node (Mapping[str, Any]): A validated partition mapping.
+        image_map (Mapping[str, str]): Partition names mapped to replacement file names.
+
+    Returns:
+        tuple[str, PartitionEntry]: The LUN (``"0"`` when neither ``lun`` nor
+        ``phys-part`` is set) and the partition entry.
+
+    Example:
+        ``_partition_from_node({"name": "efi", "size": "512KB", "type-guid": guid}, {})[1]["size_in_kb"]``
+        returns ``"512"``.
     """
     entry: PartitionEntry = PARTITION_ENTRY_DEFAULTS.copy()
     phys_part = "0"
@@ -132,7 +170,22 @@ def _partition_from_node(
 
 
 def load(path: str, image_map: Mapping[str, str] | None = None) -> LoadedSpec:
-    """Public entry point: read ``path`` and return a normalised ``LoadedSpec``."""
+    """Public entry point: read ``path`` and return a normalised ``LoadedSpec``.
+
+    Args:
+        path (str): YAML layout file.
+        image_map (Mapping[str, str] | None): Partition names mapped to replacement file names.
+
+    Returns:
+        LoadedSpec: The layout's disk parameters and partitions grouped by LUN.
+
+    Raises:
+        YamlParseError: The document is not a mapping or fails schema validation.
+        OSError: The file cannot be read.
+
+    Example:
+        ``load("tests/unit/data/glymur-crd-nvme.yaml")["disk"]["type"]`` returns ``"nvme"``.
+    """
     if image_map is None:
         image_map = {}
     with open(path) as f:

@@ -8,6 +8,14 @@ from xml.etree import ElementTree as ET
 
 
 def usage():
+    """Print the ``gen_contents`` command-line usage and exit with status 1.
+
+    Raises:
+        SystemExit: Always.
+
+    Example:
+        ``qcom-ptool gen_contents -h`` prints this usage.
+    """
     print(
         (
             "\n\tUsage: %s -t <template> -p <partitions_xml_path> -o <output> \n\tVersion 0.1\n"
@@ -18,6 +26,18 @@ def usage():
 
 
 def ParseXML(XMLFile):
+    """Parse an XML file and return its root element, or None on failure.
+
+    Args:
+        XMLFile (str): Path of the XML file to read.
+
+    Returns:
+        xml.etree.ElementTree.Element | None: The root element, or None when the
+        file is missing or is not well-formed XML; the error is printed.
+
+    Example:
+        ``ParseXML("partitions.xml").tag`` returns ``"configuration"``.
+    """
     try:
         tree = ET.parse(XMLFile)
         root = tree.getroot()
@@ -31,6 +51,24 @@ def ParseXML(XMLFile):
 
 
 def UpdateMetaData(TemplateRoot, PartitionRoot, BuildId):
+    """Fill a contents.xml template with the partition and GPT files of a partition layout.
+
+    Every ``builds_flat/build`` gets a ``build_id``. In the ``common`` build, the
+    template's ``download_file``, ``partition_file`` and ``partition_patch_file``
+    entries are replaced by one entry per partition image and one GPT, rawprogram,
+    and patch entry per physical partition, using the storage type of the
+    ``default`` chip ID flavor.
+
+    Args:
+        TemplateRoot (xml.etree.ElementTree.Element): Root of the parsed
+            ``contents.xml.in`` template; updated in place.
+        PartitionRoot (xml.etree.ElementTree.Element): Root of the parsed
+            partitions.xml produced by ``gen_partition``.
+        BuildId (str): Text for each ``build_id`` element; may be empty.
+
+    Example:
+        ``UpdateMetaData(ParseXML("contents.xml.in"), ParseXML("partitions.xml"), "")``
+    """
     ChipIdList = TemplateRoot.findall("product_info/chipid")
     DefaultStorageType: str = ""
     for ChipId in ChipIdList:
@@ -50,7 +88,19 @@ def UpdateMetaData(TemplateRoot, PartitionRoot, BuildId):
     print(f"Partitions: {Partitions}")
 
     def _add_file_elements(parent_element, pathname, file_path_flavor=None):
-        """Helper function to add file_name and file_path sub-elements."""
+        """Helper function to add file_name and file_path sub-elements.
+
+        Args:
+            parent_element (xml.etree.ElementTree.Element): Element that receives the
+                ``file_name`` and ``file_path`` children.
+            pathname (str): File path; its directory part, or ``.``, becomes ``file_path``.
+            file_path_flavor (str | None): Value of the ``flavor`` attribute on
+                ``file_path``, or None for no attribute.
+
+        Example:
+            ``_add_file_elements(download_file, "gpt_main0.bin")`` adds
+            ``<file_name>gpt_main0.bin</file_name>`` and ``<file_path>.</file_path>``.
+        """
         file_name_text = os.path.basename(pathname)
         file_path_text = os.path.dirname(pathname)
         if not file_path_text:  # no directory, use explicit . as current dir
