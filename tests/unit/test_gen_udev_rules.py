@@ -15,6 +15,11 @@ LAYOUT = REPO_ROOT / "platforms" / "qcs6490-rb3gen2" / "ufs" / "partitions.conf"
 
 
 def test_generate_rules_uses_layout_names() -> None:
+    """Check that raw partition names from a layout become rules and filesystem names do not.
+
+    Example:
+        ``pytest tests/unit/test_gen_udev_rules.py::test_generate_rules_uses_layout_names``
+    """
     rules = gen_udev_rules.generate_rules([LAYOUT])
 
     assert 'ENV{PARTNAME}=="xbl_a"' in rules
@@ -26,6 +31,14 @@ def test_generate_rules_uses_layout_names() -> None:
 def test_generate_rules_merges_layouts_and_deduplicates(
     tmp_path: Path,
 ) -> None:
+    """Check that names from several layouts are merged with each raw name emitted once.
+
+    Args:
+        tmp_path (pathlib.Path): Per-test temporary directory from pytest.
+
+    Example:
+        ``pytest tests/unit/test_gen_udev_rules.py::test_generate_rules_merges_layouts_and_deduplicates``
+    """
     first = tmp_path / "first.conf"
     second = tmp_path / "second.conf"
     first.write_text(
@@ -48,6 +61,11 @@ def test_generate_rules_merges_layouts_and_deduplicates(
 
 
 def test_generate_rules_preserves_persistent_links() -> None:
+    """Check that the generated rules keep the blkid flag and the persistent partition links.
+
+    Example:
+        ``pytest tests/unit/test_gen_udev_rules.py::test_generate_rules_preserves_persistent_links``
+    """
     rules = gen_udev_rules.generate_rules([LAYOUT])
 
     assert 'ENV{PARTNAME}=="", GOTO="qcom_raw_links"' in rules
@@ -60,6 +78,15 @@ def test_generate_rules_preserves_persistent_links() -> None:
 def test_load_filesystem_names_rejects_unsafe_name(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    """Check that a filesystem name list entry with unsafe characters is rejected with its line number.
+
+    Args:
+        tmp_path (pathlib.Path): Per-test temporary directory from pytest.
+        monkeypatch (pytest.MonkeyPatch): Replaces module settings or the working directory for the test.
+
+    Example:
+        ``pytest tests/unit/test_gen_udev_rules.py::test_load_filesystem_names_rejects_unsafe_name``
+    """
     policy = tmp_path / "names.list"
     policy.write_text('rootfs\nrootfs", RUN+="/bin/true\n', encoding="utf-8")
     monkeypatch.setattr(gen_udev_rules, "FILESYSTEM_NAMES_FILE", policy)
@@ -83,6 +110,17 @@ def test_load_filesystem_names_rejects_invalid_policy(
     content: str,
     message: str,
 ) -> None:
+    """Check that duplicate or missing filesystem names are rejected.
+
+    Args:
+        tmp_path (pathlib.Path): Per-test temporary directory from pytest.
+        monkeypatch (pytest.MonkeyPatch): Replaces module settings or the working directory for the test.
+        content (str): Name list contents supplied by the parametrisation.
+        message (str): Expected error message fragment.
+
+    Example:
+        ``pytest tests/unit/test_gen_udev_rules.py::test_load_filesystem_names_rejects_invalid_policy``
+    """
     policy = tmp_path / "names.list"
     policy.write_text(content, encoding="utf-8")
     monkeypatch.setattr(gen_udev_rules, "FILESYSTEM_NAMES_FILE", policy)
@@ -92,6 +130,14 @@ def test_load_filesystem_names_rejects_invalid_policy(
 
 
 def test_main_writes_rules(tmp_path: Path) -> None:
+    """Check that ``main`` writes the rules file, creating its folder.
+
+    Args:
+        tmp_path (pathlib.Path): Per-test temporary directory from pytest.
+
+    Example:
+        ``pytest tests/unit/test_gen_udev_rules.py::test_main_writes_rules``
+    """
     output = tmp_path / "rules.d" / "55-qcom.rules"
 
     assert gen_udev_rules.main(["-i", str(LAYOUT), "-o", str(output)]) == 0
@@ -99,6 +145,15 @@ def test_main_writes_rules(tmp_path: Path) -> None:
 
 
 def test_main_discovers_repo_layouts(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Check that ``main`` without ``-i`` reads the repository's ``platforms`` layouts.
+
+    Args:
+        tmp_path (pathlib.Path): Per-test temporary directory from pytest.
+        monkeypatch (pytest.MonkeyPatch): Replaces module settings or the working directory for the test.
+
+    Example:
+        ``pytest tests/unit/test_gen_udev_rules.py::test_main_discovers_repo_layouts``
+    """
     monkeypatch.chdir(REPO_ROOT)
     output = tmp_path / "rules"
 
@@ -109,6 +164,15 @@ def test_main_discovers_repo_layouts(tmp_path: Path, monkeypatch: pytest.MonkeyP
 def test_generate_rules_rejects_missing_default_layouts(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    """Check that ``generate_rules`` fails when no default layouts are found.
+
+    Args:
+        tmp_path (pathlib.Path): Per-test temporary directory from pytest.
+        monkeypatch (pytest.MonkeyPatch): Replaces module settings or the working directory for the test.
+
+    Example:
+        ``pytest tests/unit/test_gen_udev_rules.py::test_generate_rules_rejects_missing_default_layouts``
+    """
     monkeypatch.chdir(tmp_path)
 
     with pytest.raises(ValueError, match="no partition layouts found"):
